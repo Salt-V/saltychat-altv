@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "module": "esnext",
+    "target": "esnext",
+    "removeComments": true,
+    "noEmitOnError": true,
+    "sourceMap": false,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@altv"
+    ],
+    "outDir": "../Resource/Client"
+  },
+  "include": [
+    "source/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

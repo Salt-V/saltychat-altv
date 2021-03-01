@@ -1,0 +1,8 @@
+.vs
+.idea
+Resource/*.dll
+Resource/*.json
+Resource/*.pdb
+SaltyChat.Client/**/*.js
+obj/
+bin/

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaltyChat.Server", "SaltyChat.Server\SaltyChat.Server.csproj", "{F41A2FE3-C57E-4C02-82FB-0C853E4D41A5}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "SaltyChat.Client", "SaltyChat.Client\SaltyChat.Client.njsproj", "{89782E66-6170-4275-BFAB-DAE0C34B5D86}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F41A2FE3-C57E-4C02-82FB-0C853E4D41A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F41A2FE3-C57E-4C02-82FB-0C853E4D41A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F41A2FE3-C57E-4C02-82FB-0C853E4D41A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F41A2FE3-C57E-4C02-82FB-0C853E4D41A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89782E66-6170-4275-BFAB-DAE0C34B5D86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89782E66-6170-4275-BFAB-DAE0C34B5D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89782E66-6170-4275-BFAB-DAE0C34B5D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89782E66-6170-4275-BFAB-DAE0C34B5D86}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BA7812E4-49C6-443C-B0BF-8B5CBE884D1C}
+	EndGlobalSection
+EndGlobal

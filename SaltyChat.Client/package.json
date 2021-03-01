@@ -1,0 +1,19 @@
+{
+  "name": "salty-chat.client",
+  "version": "0.0.0",
+  "description": "SaltyChat.Client",
+  "main": "app.js",
+  "author": {
+    "name": ""
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
+  },
+  "devDependencies": {
+    "@altv/types-client": "^1.5.2",
+    "@altv/types-natives": "^1.1.0",
+    "@types/node": "^8.0.14",
+    "typescript": "^3.2.2"
+  }
+}
