@@ -23,6 +23,8 @@ namespace SaltyChat.Server
         #region Properties
 
         public static VoiceManager Instance { get; private set; }
+        
+        public static Configuration Configuration { get; private set; }
 
         public IEnumerable<VoiceClient> VoiceClients
         {
@@ -52,8 +54,7 @@ namespace SaltyChat.Server
             {
                 try
                 {
-                    var config = JsonConvert.DeserializeObject<VoiceConfiguration>(File.ReadAllText(configFile));
-                    config.MapToConfiguration();
+                    Configuration = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configFile));
                     Alt.Log("[SaltyChat] Loaded configuration from config.json");
                     Alt.Log($"[SaltyChat] Server Identifier: {Configuration.ServerIdentifier}");
                 }

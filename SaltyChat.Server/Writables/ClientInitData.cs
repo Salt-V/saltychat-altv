@@ -15,29 +15,29 @@ namespace SaltyChat.Server.Writables
         {
             writer.BeginObject();
             writer.Name("serverIdentifier");
-            writer.Value(Configuration.ServerIdentifier);
+            writer.Value(VoiceManager.Configuration.ServerIdentifier);
             writer.Name("teamSpeakName");
             writer.Value(_teamSpeakName);
             writer.Name("soundPack");
-            writer.Value(Configuration.SoundPack);
+            writer.Value(VoiceManager.Configuration.SoundPack);
             writer.Name("ingameChannel");
-            writer.Value(Configuration.IngameChannel);
+            writer.Value(VoiceManager.Configuration.IngameChannel);
             writer.Name("ingameChannelPassword");
-            writer.Value(Configuration.IngameChannelPassword);
+            writer.Value(VoiceManager.Configuration.IngameChannelPassword);
             writer.Name("swissChannels");
 
             writer.BeginArray();
-            foreach (var channel in Configuration.SwissChannels) writer.Value(channel);
+            foreach (var channel in VoiceManager.Configuration.SwissChannels) writer.Value(channel);
             writer.EndArray();
 
             writer.Name("voiceRanges");
             writer.BeginArray();
-            foreach (var voiceRange in Configuration.VoiceRanges) writer.Value(voiceRange);
+            foreach (var voiceRange in VoiceManager.Configuration.VoiceRanges) writer.Value(voiceRange);
             writer.EndArray();
 
             writer.Name("radioTowers");
             writer.BeginArray();
-            foreach (var radioTower in Configuration.RadioTowers)
+            foreach (var radioTower in VoiceManager.Configuration.RadioTowers)
             {
                 writer.BeginObject();
                 writer.Name("x");
@@ -52,9 +52,9 @@ namespace SaltyChat.Server.Writables
             writer.EndArray();
 
             writer.Name("requestTalkStates");
-            writer.Value(Configuration.RequestTalkStates);
+            writer.Value(VoiceManager.Configuration.RequestTalkStates);
             writer.Name("requestRadioTrafficStates");
-            writer.Value(Configuration.RequestRadioTrafficStates);
+            writer.Value(VoiceManager.Configuration.RequestRadioTrafficStates);
             writer.EndObject();
         }
     }
