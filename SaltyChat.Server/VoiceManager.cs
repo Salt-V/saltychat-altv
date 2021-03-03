@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Numerics;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AltV.Net;
 using AltV.Net.Async;
+using AltV.Net.ColoredConsole;
 using AltV.Net.Elements.Entities;
+using Newtonsoft.Json;
 using SaltyChat.Server.Models;
 using SaltyChat.Server.Writables;
 
@@ -27,6 +33,23 @@ namespace SaltyChat.Server
 
         public VoiceManager()
         {
+            var configFile = Path.Combine(Alt.Server.RootDirectory, "resources", Alt.Server.Resource.Name, "config.json");
+            if (File.Exists(configFile))
+            {
+                try
+                {
+                    var config = JsonConvert.DeserializeObject<VoiceConfiguration>(File.ReadAllText(configFile));
+                    config.MapToConfiguration();
+                    Alt.Log("[SaltyChat] Loaded configuration from config.json");
+                    Alt.Log($"[SaltyChat] Server Identifier: {Configuration.ServerIdentifier}");
+                }
+                catch (Exception ex)
+                {
+                    Alt.Log("[SaltyChat] Failed loading configuration from config.json: " + ex);
+                    Environment.FailFast("Failed loading configuration from config.json", ex);
+                }
+            }
+
             Instance = this;
             AltAsync.OnClient<IPlayer, string>("SaltyChat:CheckVersion", OnClientCheckVersion);
             AltAsync.OnClient<IPlayer, bool>("SaltyChat:IsUsingMegaphone", OnClientIsUsingMegaphone);
