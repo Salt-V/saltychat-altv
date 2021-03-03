@@ -90,13 +90,13 @@ namespace SaltyChat.Server
         {
             lock (player)
             {
+                AltAsync.EmitAllClients("SaltyChat:RemoveClient", player.Id);
                 lock (_voiceClients)
                 {
                     if (!_voiceClients.TryGetValue(player, out var voiceClient)) return;
                     foreach (var radioChannel in _radioChannels) radioChannel.RemoveMember(voiceClient);
 
                     _voiceClients.TryRemove(player, out _);
-                    AltAsync.EmitAllClients("SaltyChat:RemoveClient", player.Id);
                 }
             }
 
