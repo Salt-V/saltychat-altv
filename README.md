@@ -15,7 +15,7 @@ For more information and a getting started guide check out the [wiki](https://gi
 
 # Support
 There won't be any private support for this script.\
-If you experience any bugs using this script, feel free to open up an issue.\
+If you experience any bugs using this script, feel free to open up an issue. Same applies to feature requests.\
 If your issue belongs to SaltyChat, ask in the appropriate channels on the [Salty Chat Discord](https://discord.gg/MBCnqSf).
 
 # Maintainers
