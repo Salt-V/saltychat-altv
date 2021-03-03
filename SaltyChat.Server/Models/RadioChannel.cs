@@ -50,10 +50,10 @@ namespace SaltyChat.Server.Models
             {
                 if (_members.Any(m => m.VoiceClient == voiceClient)) return;
                 _members.Add(new RadioChannelMember(this, voiceClient, isPrimary));
-                voiceClient.Player.EmitLocked("SaltyVoice:RadioSetChannel", Name, isPrimary);
+                voiceClient.Player.EmitLocked("SaltyChat:RadioSetChannel", Name, isPrimary);
                 foreach (var member in _members.Where(m => m.IsSending))
                 {
-                    voiceClient.Player.EmitLocked("SaltyVoice:PlayerIsSending", member.VoiceClient.Player, Name, true, false, member.VoiceClient.Player.Position);
+                    voiceClient.Player.EmitLocked("SaltyChat:PlayerIsSending", member.VoiceClient.Player, Name, true, false, member.VoiceClient.Player.Position);
                 }
             }
         }
@@ -70,14 +70,14 @@ namespace SaltyChat.Server.Models
                     {
                         foreach (var client in VoiceManager.Instance.VoiceClients)
                         {
-                            client.Player.EmitLocked("SaltyVoice:PlayerIsSendingRelayed", voiceClient.Player, Name, false, true, voiceClient.Player.Position, false, Array.Empty<string>());
+                            client.Player.EmitLocked("SaltyChat:PlayerIsSendingRelayed", voiceClient.Player, Name, false, true, voiceClient.Player.Position, false, Array.Empty<string>());
                         }
                     }
                     else
                     {
                         foreach (var client in VoiceManager.Instance.VoiceClients)
                         {
-                            client.Player.EmitLocked("SaltyVoice:PlayerIsSending", voiceClient.Player, Name, false, true, voiceClient.Player.Position);
+                            client.Player.EmitLocked("SaltyChat:PlayerIsSending", voiceClient.Player, Name, false, true, voiceClient.Player.Position);
                         }
                     }
                 }
@@ -86,10 +86,10 @@ namespace SaltyChat.Server.Models
 
                 foreach (var channelMember in _members.Where(m => m.IsSending))
                 {
-                    voiceClient.Player.EmitLocked("SaltyVoice:PlayerIsSending", channelMember.VoiceClient.Player, Name, false, false, channelMember.VoiceClient.Player.Position);
+                    voiceClient.Player.EmitLocked("SaltyChat:PlayerIsSending", channelMember.VoiceClient.Player, Name, false, false, channelMember.VoiceClient.Player.Position);
                 }
 
-                voiceClient.Player.EmitLocked("SaltyVoice:RadioLeaveChannel", null, member.IsPrimary);
+                voiceClient.Player.EmitLocked("SaltyChat:RadioLeaveChannel", null, member.IsPrimary);
             }
         }
         
@@ -120,7 +120,7 @@ namespace SaltyChat.Server.Models
                 {
                     foreach (var client in VoiceManager.Instance.VoiceClients.Where(v => radioChannelMembers.All(m => m.VoiceClient != v)))
                     {
-                        client.Player.EmitLocked("Voice:PlayerIsSendingRelayed", sendingMember.VoiceClient.Player, Name, false, false, sendingMember.VoiceClient.Player.Position, false, new string[0]);
+                        client.Player.EmitLocked("SaltyChat:PlayerIsSendingRelayed", sendingMember.VoiceClient.Player, Name, false, false, sendingMember.VoiceClient.Player.Position, false, new string[0]);
                     }
                 }
             }
@@ -146,14 +146,14 @@ namespace SaltyChat.Server.Models
                 var channelMemberNames = onSpeaker.Select(m => m.VoiceClient.TeamSpeakName).ToArray();
                 foreach (var remoteClient in VoiceManager.Instance.VoiceClients)
                 {
-                    remoteClient.Player.EmitLocked("SaltyVoice:PlayerIsSendingRelayed", voiceClient.Player, Name, isSending, stateChanged, voiceClient.Player.Position, IsMember(remoteClient), channelMemberNames);
+                    remoteClient.Player.EmitLocked("SaltyChat:PlayerIsSendingRelayed", voiceClient.Player, Name, isSending, stateChanged, voiceClient.Player.Position, IsMember(remoteClient), channelMemberNames);
                 }
             }
             else
             {
                 foreach (var member in channelMembers)
                 {
-                    member.VoiceClient.Player.EmitLocked("SaltyVoice:PlayerIsSending", voiceClient.Player, Name, isSending, stateChanged, voiceClient.Player.Position);
+                    member.VoiceClient.Player.EmitLocked("SaltyChat:PlayerIsSending", voiceClient.Player, Name, isSending, stateChanged, voiceClient.Player.Position);
                 }
             }
         }
