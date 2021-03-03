@@ -23,9 +23,23 @@ namespace SaltyChat.Server
         #region Properties
 
         public static VoiceManager Instance { get; private set; }
-        public IEnumerable<VoiceClient> VoiceClients => _voiceClients.Values.ToArray();
-        private ConcurrentDictionary<IPlayer, VoiceClient> _voiceClients = new ConcurrentDictionary<IPlayer, VoiceClient>();
-        private List<RadioChannel> _radioChannels = new List<RadioChannel>();
+
+        public IEnumerable<VoiceClient> VoiceClients
+        {
+            get
+            {
+                VoiceClient[] clients;
+                lock (_voiceClients)
+                {
+                    clients = _voiceClients.Values.ToArray();
+                }
+
+                return clients;
+            }
+        }
+
+        private readonly ConcurrentDictionary<IPlayer, VoiceClient> _voiceClients = new ConcurrentDictionary<IPlayer, VoiceClient>();
+        private readonly List<RadioChannel> _radioChannels = new List<RadioChannel>();
 
         #endregion
 
