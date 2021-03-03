@@ -409,6 +409,7 @@ export class SaltyVoice {
 
         this.VoiceClients.forEach((voiceClient) => {
             let nextPlayer = voiceClient.player;
+            if (!nextPlayer.valid) return;
             if (nextPlayer.scriptID == 0) {
                 if (!voiceClient.distanceCulled) {
                     voiceClient.distanceCulled = true;
