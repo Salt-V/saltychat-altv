@@ -435,9 +435,9 @@ export class SaltyVoice {
                     } else {
                         let pVehicle = alt.Player.local.vehicle;
                         let nVehicle = nextPlayer.vehicle;
-                        if (pVehicle != nVehicle && (pVehicle != null && nVehicle != null)) {
-                            if (!hasOpening(pVehicle)) muffleIntensity += 4;
-                            if (!hasOpening(nVehicle)) muffleIntensity += 4;
+                        if (pVehicle != nVehicle) {
+                            if (pVehicle && !hasOpening(pVehicle)) muffleIntensity += 4;
+                            if (nVehicle && !hasOpening(nVehicle)) muffleIntensity += 4;
                         }
                     }
                 }
