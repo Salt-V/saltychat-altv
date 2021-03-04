@@ -74,7 +74,7 @@ namespace SaltyChat.Server
             AltAsync.OnPlayerDisconnect += OnServerPlayerDisconnect;
             AltAsync.OnServer<IPlayer, bool>("SaltyChat:SetPlayerAlive", OnServerSetPlayerAlive);
             AltAsync.OnServer<IPlayer>("SaltyChat:EnablePlayer", OnServerEnablePlayer);
-            AltAsync.OnServer<Vector3[]>("SaltyChat:UpdateRadioTowers", OnServerUpdateRadioTowers);
+            AltAsync.OnServer<string>("SaltyChat:UpdateRadioTowers", OnServerUpdateRadioTowers);
             AltAsync.OnServer<IPlayer, string, bool>("SaltyChat:JoinRadioChannel", OnServerJoinRadioChannel);
             AltAsync.OnServer<IPlayer, string>("SaltyChat:LeaveRadioChannel", OnServerLeaveRadioChannel);
             AltAsync.OnServer<IPlayer>("SaltyChat:LeaveAllRadioChannel", OnServerLeaveAllRadioChannel);
@@ -225,10 +225,10 @@ namespace SaltyChat.Server
 
         #region Exports: Radio
 
-        private async void OnServerUpdateRadioTowers(Vector3[] radioTowers)
+        private async void OnServerUpdateRadioTowers(string radioTowersStr)
         {
-            Configuration.RadioTowers = radioTowers;
-            AltAsync.EmitAllClients("SaltyChat:UpdateRadioTowers", radioTowers);
+            Configuration.RadioTowers = JsonConvert.DeserializeObject<Vector3[]>(radioTowersStr);
+            AltAsync.EmitAllClients("SaltyChat:UpdateRadioTowers", Configuration.RadioTowers);
 
             await Task.CompletedTask;
         }
