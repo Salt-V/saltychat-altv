@@ -1,7 +1,7 @@
 .vs
 .idea
 Resource/*.dll
-Resource/*.json
+Resource/*.deps.json
 Resource/*.pdb
 SaltyChat.Client/**/*.js
 obj/

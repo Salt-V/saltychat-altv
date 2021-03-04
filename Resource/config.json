@@ -1,0 +1,20 @@
+{
+  "ServerIdentifier": "CHANGEME",
+  "SoundPack": "default",
+  "IngameChannel": CHANGEME,
+  "IngameChannelPassword": "CHANGEME",
+  "SwissChannels": [],
+  "VoiceRanges": [
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0
+  ],
+  "RadioTowers": [{"X":450.932,"Y":5566.451,"Z":795.442},{"X":1695.486,"Y":3614.863,"Z":37.797},{"X":758.466,"Y":1273.721,"Z":405.945},{"X":-2050.939,"Y":3178.414,"Z":54.331},{"X":551.996,"Y":-28.199,"Z":93.862},{"X":-598.834,"Y":-917.809,"Z":35.844},{"X":548.352,"Y":-2219.756,"Z":67.947},{"X":-1308.23,"Y":-2626.368,"Z":36.089}],
+  "RequestTalkStates": true,
+  "RequestRadioTrafficStates": false,
+  "MinimumPluginVersion": "2.2.2",
+  "MegaphoneRange": 200.0,
+  "NamePattern": "{guid}"
+}
