@@ -114,7 +114,10 @@ namespace SaltyChat.Server
                 if (!_voiceClients.TryGetValue(player, out var voiceClient)) return;
             }
 
-            if (!IsVersionAccepted(version)) player.Kick($"[Salty Chat] Voice Plugin ist veraltet. Mindestversion: {Configuration.MinimumPluginVersion}");
+            if (!IsVersionAccepted(version))
+            {
+                player.Kick($"[Salty Chat] Required plugin version: {Configuration.MinimumPluginVersion}");
+            }
 
             await Task.CompletedTask;
         }
