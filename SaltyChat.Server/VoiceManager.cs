@@ -188,7 +188,7 @@ namespace SaltyChat.Server
             {
                 if (!_voiceClients.TryGetValue(player, out var voiceClient)) return;
                 voiceClient.IsAlive = isAlive;
-                AltAsync.EmitAllClients("Voice:UpdateClientAlive", voiceClient.Player, isAlive);
+                AltAsync.EmitAllClients("SaltyChat:UpdateClientAlive", voiceClient.Player, isAlive);
             }
 
             await Task.CompletedTask;
