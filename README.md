@@ -14,9 +14,6 @@ see [Versioning and Update Branches](https://github.com/saltminede/saltychat-doc
 For more information and a getting started guide check out the [wiki](https://github.com/deluvas1911/saltychat-altv/wiki).
 
 # Support
-There won't be any private support for this script.\
+**There won't be any private support for this script.\
 If you experience any bugs using this script, feel free to open up an issue. Same applies to feature requests.\
-If your issue belongs to SaltyChat, ask in the appropriate channels on the [Salty Chat Discord](https://discord.gg/MBCnqSf).
-
-# Maintainers
-Maintained by [deluvas1911](https://github.com/deluvas1911) and [THEONLYLUCIF3R](https://github.com/THEONLYLUCIF3R)
+If your issue belongs to SaltyChat, ask in the appropriate channels on the [Salty Chat Discord](https://discord.gg/MBCnqSf).**
