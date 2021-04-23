@@ -5,7 +5,7 @@ Don't use this if you don't know what you're doing and/or you don't know how to 
 
 # Salty Chat for [Alt:V](https://altv.mp//)
 
-An example implementation of Salty Chat for [AltV](https://altv.mp//).  
+An example implementation of Salty Chat for [Alt:V](https://altv.mp//).  
 
 You can report bugs or make sugguestions via issues, or contribute via pull requests - we appreciate any contribution.\
 Join the [Salty Chat Discord](https://discord.gg/MBCnqSf) and start with [Salty Chat](https://www.saltmine.de/)!
