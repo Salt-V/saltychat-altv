@@ -1,4 +1,9 @@
-# Salty Chat for [AltV](https://altv.mp//)
+# Read me before use
+This plugin is not tested and high player counts.\
+Although it's designed to be plug & play, there may be issues with some functions of the script.\
+Don't use this if you don't know what you're doing and/or you don't know how to debug JS & C#.
+
+# Salty Chat for [Alt:V](https://altv.mp//)
 
 An example implementation of Salty Chat for [AltV](https://altv.mp//).  
 
