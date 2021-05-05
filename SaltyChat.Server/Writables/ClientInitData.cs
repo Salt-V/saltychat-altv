@@ -36,25 +36,18 @@ namespace SaltyChat.Server.Writables
             writer.EndArray();
 
             writer.Name("radioTowers");
-            writer.BeginArray();
-            foreach (var radioTower in VoiceManager.Configuration.RadioTowers)
-            {
-                writer.BeginObject();
-                writer.Name("x");
-                writer.Value(radioTower.X);
-                writer.Name("y");
-                writer.Value(radioTower.Y);
-                writer.Name("z");
-                writer.Value(radioTower.Z);
-                writer.EndObject();
-            }
-
-            writer.EndArray();
+            new ClientRadioTowers(VoiceManager.Configuration.RadioTowers).OnWrite(writer);
 
             writer.Name("requestTalkStates");
             writer.Value(VoiceManager.Configuration.RequestTalkStates);
             writer.Name("requestRadioTrafficStates");
             writer.Value(VoiceManager.Configuration.RequestRadioTrafficStates);
+            writer.Name("radioRangeUltraShort");
+            writer.Value(VoiceManager.Configuration.RadioRangeUltraShort);
+            writer.Name("radioRangeShort");
+            writer.Value(VoiceManager.Configuration.RadioRangeShort);
+            writer.Name("radioRangeLong");
+            writer.Value(VoiceManager.Configuration.RadioRangeLong);
             writer.EndObject();
         }
     }

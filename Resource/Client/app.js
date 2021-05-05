@@ -11,7 +11,7 @@ import { PlayerState } from "./Models/SaltyChat/PlayerState";
 import { PluginCommand } from "./Models/SaltyChat/PluginCommand";
 import { RadioCommunication } from "./Models/SaltyChat/RadioCommunication";
 import { RadioConfiguration } from "./Models/SaltyChat/RadioConfiguration";
-import { RadioTower } from "./Models/SaltyChat/RadioTower";
+import { RadioTowers } from "./Models/SaltyChat/RadioTower";
 import { SelfState } from "./Models/SaltyChat/SelfState";
 import { SoundState } from "./Models/SaltyChat/SoundState";
 import { Sound } from "./Models/SaltyChat/Sound";
@@ -25,6 +25,7 @@ import { ToClient } from "./Enum/Events/ToClient";
 import { ToServer } from "./Enum/Events/ToServer";
 export class SaltyVoice {
     constructor() {
+        this._streamedClients = new Set();
         this._clientIdMap = new Map();
         this._radioConfiguration = new RadioConfiguration;
         this._soundState = new SoundState;
@@ -32,6 +33,8 @@ export class SaltyVoice {
         this.VoiceClients = new Map();
         if (SaltyVoice._instance != null)
             return;
+        alt.on("gameEntityCreate", this.onGameEntityCreate.bind(this));
+        alt.on("gameEntityDestroy", this.onGameEntityDestroy.bind(this));
         alt.onceServer(FromServer.initialize, this.onServerInitialize.bind(this));
         alt.onServer(FromServer.syncClients, this.onServerSyncClients.bind(this));
         alt.onServer(FromServer.updateClient, this.onServerUpdateClient.bind(this));
@@ -72,9 +75,25 @@ export class SaltyVoice {
             SaltyVoice._instance = new SaltyVoice();
         return SaltyVoice._instance;
     }
+    onGameEntityCreate(entity) {
+        if (!(entity instanceof alt.Player))
+            return;
+        this._streamedClients.add(entity);
+    }
+    onGameEntityDestroy(entity) {
+        if (!(entity instanceof alt.Player))
+            return;
+        this._streamedClients.delete(entity);
+    }
     onServerInitialize(configuration) {
         this._configuration = configuration;
         this._voiceRange = configuration.voiceRanges[1];
+        this.initialize();
+    }
+    initialize() {
+        if (Config.enableOverlay && this._gameInstanceState <= GameInstanceState.notConnected) {
+            this._webView.emit("showOverlay", true, Config.overlayLanguage, Config.overlayAddress);
+        }
         if (this._gameInstanceState == GameInstanceState.connected)
             this.initializePlugin();
         else {
@@ -85,15 +104,13 @@ export class SaltyVoice {
                 this.initializePlugin();
             }, 500);
         }
-        if (Config.enableOverlay && this._gameInstanceState <= GameInstanceState.notConnected) {
-            this._webView.emit("showOverlay", true, Config.overlayLanguage, Config.overlayAddress);
-        }
     }
     onServerSyncClients(voiceClients) {
         this.VoiceClients.clear();
         this._clientIdMap.clear();
         voiceClients.forEach((client) => {
-            this.onServerUpdateClient(alt.Player.getByID(client.id), client.teamSpeakName, client.voiceRange, client.isAlive, client.position);
+            let player = alt.Player.getByID(client.id);
+            this.onServerUpdateClient(player, client.teamSpeakName, client.voiceRange, client.isAlive, client.position);
         });
     }
     onServerUpdateClient(player, teamSpeakName, voiceRange, isAlive, position) {
@@ -104,6 +121,8 @@ export class SaltyVoice {
     onServerUpdateClientAlive(player, isAlive) {
         if (!this.VoiceClients.has(player.id))
             return;
+        if (Config.automaticPlayerHealth)
+            Config.automaticPlayerHealth = false;
         let voiceClient = this.VoiceClients.get(player.id);
         voiceClient.isAlive = isAlive;
     }
@@ -191,7 +210,7 @@ export class SaltyVoice {
         this._configuration.radioTowers = radioTowers;
         if (this._gameInstanceState != GameInstanceState.connected)
             return;
-        this.executeCommand(new PluginCommand(Command.radioTowerUpdate, this.serverIdentifier, new RadioTower(radioTowers)));
+        this.executeCommand(new PluginCommand(Command.radioTowerUpdate, this.serverIdentifier, new RadioTowers(radioTowers)));
     }
     onServerIsUsingMegaphone(player, range, isSending, position) {
         let name = null;
@@ -220,7 +239,6 @@ export class SaltyVoice {
     onDisconnected() {
         this._gameInstanceState = GameInstanceState.notConnected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
-        this.initializePlugin();
     }
     onMessage(messageJson) {
         let message = JSON.parse(messageJson);
@@ -229,7 +247,7 @@ export class SaltyVoice {
         switch (message.Command) {
             case Command.pluginState:
                 alt.emitServer(ToServer.checkVersion, message.Parameter.Version);
-                this.executeCommand(new PluginCommand(Command.radioTowerUpdate, this.serverIdentifier, new RadioTower(this._configuration.radioTowers)));
+                this.executeCommand(new PluginCommand(Command.radioTowerUpdate, this.serverIdentifier, new RadioTowers(this._configuration.radioTowers)));
                 break;
             case Command.reset:
                 this._gameInstanceState = GameInstanceState.notInitiated;
@@ -242,12 +260,7 @@ export class SaltyVoice {
             case Command.instanceState:
                 this._gameInstanceState = message.Parameter.State;
                 if (Config.enableOverlay) {
-                    if (this._gameInstanceState <= GameInstanceState.notConnected) {
-                        this._webView.emit("showOverlay", true, Config.overlayLanguage, Config.overlayAddress);
-                    }
-                    else {
-                        this._webView.emit("showOverlay", false);
-                    }
+                    this._webView.emit("showOverlay", this._gameInstanceState <= GameInstanceState.notConnected, Config.overlayLanguage, Config.overlayAddress);
                 }
                 alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
                 break;
@@ -300,11 +313,12 @@ export class SaltyVoice {
             return;
         let playerStates = [];
         let localRoomId = native.getRoomKeyFromEntity(alt.Player.local.scriptID);
+        let localScriptId = alt.Player.local.scriptID;
         this.VoiceClients.forEach((voiceClient) => {
             let nextPlayer = voiceClient.player;
             if (!nextPlayer.valid)
                 return;
-            if (nextPlayer.scriptID == 0) {
+            if (!this._streamedClients.has(nextPlayer)) {
                 if (!voiceClient.distanceCulled) {
                     voiceClient.distanceCulled = true;
                     playerStates.push(new PlayerState(voiceClient.teamSpeakName, voiceClient.lastPosition, voiceClient.voiceRange, voiceClient.isAlive, voiceClient.distanceCulled, null));
@@ -313,11 +327,13 @@ export class SaltyVoice {
             else {
                 if (voiceClient.distanceCulled)
                     voiceClient.distanceCulled = false;
+                if (Config.automaticPlayerHealth)
+                    voiceClient.isAlive = nextPlayer.health > 0;
                 voiceClient.lastPosition = nextPlayer.pos;
                 let muffleIntensity = null;
                 if (Config.enableMuffling) {
                     let npRoomId = native.getRoomKeyFromEntity(nextPlayer.scriptID);
-                    if (localRoomId != npRoomId && !native.hasEntityClearLosToEntity(alt.Player.local.scriptID, nextPlayer.scriptID, 17)) {
+                    if (localRoomId != npRoomId && !native.hasEntityClearLosToEntity(localScriptId, nextPlayer.scriptID, 17)) {
                         muffleIntensity = 10;
                     }
                     else {
@@ -353,7 +369,7 @@ export class SaltyVoice {
         }
     }
     initializePlugin() {
-        this.executeCommand(new PluginCommand(Command.initiate, this.serverIdentifier, new GameInstance(this.serverIdentifier, this._configuration.teamSpeakName, this._configuration.ingameChannel, this._configuration.ingameChannelPassword, this._configuration.soundPack, this._configuration.swissChannels, this._configuration.requestTalkStates, this._configuration.requestRadioTrafficStates)));
+        this.executeCommand(new PluginCommand(Command.initiate, this.serverIdentifier, new GameInstance(this.serverIdentifier, this._configuration.teamSpeakName, this._configuration.ingameChannel, this._configuration.ingameChannelPassword, this._configuration.soundPack, this._configuration.swissChannels, this._configuration.requestTalkStates, this._configuration.requestRadioTrafficStates, this._configuration.radioRangeUltraShort, this._configuration.radioRangeShort, this._configuration.radioRangeLong)));
     }
     onClientUseRadio(primaryRadio, isSending) {
         if (primaryRadio) {

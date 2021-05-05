@@ -7,9 +7,8 @@
 </head>
 
 <body style="font-family:Arial; font-size:26px; color:white; outline:thin; outline-color:black; text-shadow: 1px 1px 1px black; margin: 0; padding: 0;">
-<div class="nui-holder"
-        style="height: 100vh; width: 100vw; overflow: hidden; background-color: black; display: flex; justify-content: center; align-items: center">
-    <div class="salty-nui-container-de" style="text-align: center">
+<div class="nui-holder" style="height: 100vh; width: 100vw; overflow: hidden; background-color: black; display: flex; justify-content: center; align-items: center">
+    <div class="salty-nui-container lang-de" style="text-align: center; display: none;">
         <h1>Salty<span style="color: #b13c00; ">Chat</span></h1>
         <div class="info">
             Du benötigst <span style="color: #b13c00;">TeamSpeak</span> und
@@ -17,18 +16,20 @@
             <br><br>
             Was soll ich jetzt tun?
             <br>
-            Verbinde dich auf unseren Teamspeak Server: <span id="tsip1" style="color: #b13c00;">ts.ip.placeholder</span>
+            Verbinde dich auf unseren Teamspeak Server:
+            <span class="tsip" style="color: #b13c00;">ts.yourroleplayserver.com</span>
             <br>
             Lade SaltyChat runter und installiere es: <span style="color: #b13c00;">saltmine.de</span>
             <br><br>
-            <span style="color: red;">Achtung</span>, du musst dein Teamspeak und GTA neustarten nachdem du SaltyChat installiert hast.
+            <span style="color: red;">Achtung</span>, du musst dein Teamspeak und GTA neustarten nachdem du SaltyChat
+            installiert hast.
             <br><br><br>
             Solltest du Fragen oder Probleme haben wende dich gerne an unseren
             <span style="color: #b13c00;">Support.</span>
             <br><br>
         </div>
     </div>
-    <div class="salty-nui-container-en" style="text-align: center">
+    <div class="salty-nui-container lang-en" style="text-align: center; display: none;">
         <h1>Salty<span style="color: #b13c00; ">Chat</span></h1>
         <div class="info">
             For playing on our Server, you need <span style="color: #b13c00; ">TeamSpeak</span> and
@@ -36,13 +37,35 @@
             <br><br>
             What should I do now?
             <br>
-            Connect to our Teamspeak server: <span id="tsip2" style="color: #b13c00; ">ts.yourroleplayserver.com</span>
+            Connect to our Teamspeak server:
+            <span class="tsip" style="color: #b13c00; ">ts.yourroleplayserver.com</span>
             <br>
             Download and install SaltyChat: <span style="color: #b13c00; ">saltmine.de</span>
             <br><br>
-            <span style="color: red;">Attention</span>, you have to restart your Teamspeak and Game after installing Saltychat.
+            <span style="color: red;">Attention</span>, you have to restart your Teamspeak and Game after installing
+            Saltychat.
             <br><br><br>
             If you have more questions feel free to contact our <span style="color: #b13c00; ">Support.</span>
+            <br><br>
+        </div>
+    </div>
+    <div class="salty-nui-container lang-fr" style="text-align: center; display: none;">
+        <h1>Salty<span style="color: #b13c00; ">Chat</span></h1>
+        <div class="info">
+            Pour jouer sur notre serveur, vous avez besoin de <span style="color: #b13c00; ">TeamSpeak</span> et
+            <span style="color: #b13c00; ">SaltyChat</span>.
+            <br><br>
+            Que doit-je faire ?
+            <br>
+            Connectez-vous à notre serveur TeamSpeak: <span class="tsip" style="color: #b13c00; ">ts.yourroleplayserver.com</span>
+            <br>
+            Téléchargez et installez SaltyChat: <span style="color: #b13c00; ">saltmine.de</span>
+            <br><br>
+            <span style="color: red;">Attention</span>, vous devez redémarrer votre Teamspeak et votre jeu après avoir
+            installé Saltychat.
+            <br><br><br>
+            Si vous avez d'autres questions, n'hésitez pas à contacter notre
+            <span style="color: #b13c00; ">Support.</span>
             <br><br>
         </div>
     </div>
@@ -56,10 +79,6 @@
     function connect() {
         try {
             window.webSocket = new window.WebSocket(`ws://${pluginAddress}/`);
-            webSocket.onerror = function (error) {
-                isErrored = true;
-                console.error('Teamspeak not running or wrong Plugin Version');
-            };
 
             webSocket.onmessage = function (evt) {
                 let object = JSON.parse(evt.data);
@@ -79,18 +98,15 @@
 
             webSocket.onopen = function () {
                 isConnected = true;
-
                 alt.emit("onConnected");
             };
 
             webSocket.onclose = function () {
                 isConnected = false;
-
                 alt.emit("onDisconnected");
-
-                if (!isErrored) {
+                setTimeout(() => {
                     connect();
-                }
+                }, 500);
             }
         } catch (error) {
             return;
@@ -105,31 +121,38 @@
 
     function NUI(state, language = null, ts3ip = null) {
         if (state) {
-            $("#tsip1").text(ts3ip);
-            $("#tsip2").text(ts3ip);
+            $(".tsip").each(function (index) {
+                $(this).text(ts3ip);
+            });
             $(".nui-holder").css("display", "flex");
+            $(".salty-nui-container").each(function (index) {
+                $(this).css("display", "none");
+            });
             switch (language) {
                 case "de":
-                    let nuiDE = $(".salty-nui-container-de");
-                    nuiDE.css("display", "block");
-                    break;
+                    $(".lang-de").css("display", "block");
+                    return;
                 case "en":
-                    let nuiEN = $(".salty-nui-container-en");
-                    nuiEN.css("display", "block");
-                    break;
+                    $(".lang-en").css("display", "block");
+                    return;
+                case "fr":
+                    $(".lang-fr").css("display", "block");
+                    return;
             }
         } else {
             $(".nui-holder").css("display", "none");
-            $(".salty-nui-container-de").css("display", "none");
-            $(".salty-nui-container-en").css("display", "none");
+            $(".salty-nui-container").each(function (index) {
+                $(this).css("display", "none");
+            });
         }
     }
 
     document.addEventListener("DOMContentLoaded", function () {
         connect();
         $(".nui-holder").css("display", "none");
-        $(".salty-nui-container-de").css("display", "none");
-        $(".salty-nui-container-en").css("display", "none");
+        $(".salty-nui-container").each(function (index) {
+            $(this).css("display", "none");
+        });
     });
 
     alt.on('runCommand', runCommand)

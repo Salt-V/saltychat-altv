@@ -10,3 +10,4 @@ Config.enableRadioSound = true;
 Config.enableOverlay = true;
 Config.overlayLanguage = "en";
 Config.overlayAddress = "ts.yourserver.com";
+Config.automaticPlayerHealth = true;

@@ -7,8 +7,13 @@ export class GameInstance {
     public swissChannelIds: number[];
     public sendTalkStates: boolean;
     public sendRadioTrafficStates: boolean;
+    public ultraShortRangeDistance: number;
+    public shortRangeDistance: number;
+    public longRangeDistance: number;
 
-    constructor(serverUniqueIdentifier: string, name: string, channelId: number, channelPassword: string, soundPack: string, swissChannels: number[], sendTalkStates: boolean, sendRadioTrafficStates: boolean) {
+    constructor(serverUniqueIdentifier: string, name: string, channelId: number, channelPassword: string,
+                soundPack: string, swissChannels: number[], sendTalkStates: boolean, sendRadioTrafficStates: boolean,
+                rRangeUltraShort: number, rRangeShort: number, rRangeLong: number) {
         this.serverUniqueIdentifier = serverUniqueIdentifier;
         this.name = name;
         this.channelId = channelId;
@@ -17,5 +22,8 @@ export class GameInstance {
         this.swissChannelIds = swissChannels;
         this.sendTalkStates = sendTalkStates;
         this.sendRadioTrafficStates = sendRadioTrafficStates;
+        this.ultraShortRangeDistance = rRangeUltraShort;
+        this.shortRangeDistance = rRangeShort;
+        this.longRangeDistance = rRangeLong;
     }
 }
