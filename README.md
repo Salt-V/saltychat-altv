@@ -1,4 +1,8 @@
 # Read me before use
+Read the [license](https://github.com/deluvas1911/saltychat-altv/blob/master/LICENSE) before using this script.\
+Additional limitations:
+- You're not allowed to monetize this script (by selling this script, an gamemode related to this script or other ways)
+
 This plugin is not tested and high player counts.\
 Although it's designed to be plug & play, there may be issues with some functions of the script.\
 Don't use this if you don't know what you're doing and/or you don't know how to debug JS & C#.
