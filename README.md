@@ -2,6 +2,7 @@
 Read the [license](https://github.com/deluvas1911/saltychat-altv/blob/master/LICENSE) before using this script.\
 Additional limitations:
 - You're not allowed to monetize this script (by selling this script, an gamemode related to this script or other ways)
+- ValeaRP is allowed to use this script. Support for ValeaRP is only guaranteed as long as an unmodified implementation of the script is used and no customization (except editing the configuration files according to the wiki) has been performed.
 
 This plugin is not tested and high player counts.\
 Although it's designed to be plug & play, there may be issues with some functions of the script.\
