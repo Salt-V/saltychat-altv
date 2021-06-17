@@ -24,7 +24,6 @@ export class VoiceClient {
         SaltyVoice.GetInstance().executeCommand(
             new PluginCommand(
                 Command.playerStateUpdate,
-                SaltyVoice.GetInstance().serverIdentifier,
                 new PlayerState(
                     this.teamSpeakName,
                     this.lastPosition,

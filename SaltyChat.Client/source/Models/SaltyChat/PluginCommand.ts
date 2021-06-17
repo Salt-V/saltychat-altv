@@ -5,9 +5,8 @@ export class PluginCommand {
     public serverUniqueIdentifier: string;
     public parameter: any;
 
-    constructor(command: Command, serverUniqueIdentifier: string, parameter?: any) {
+    constructor(command: Command, parameter?: any) {
         this.command = command;
-        this.serverUniqueIdentifier = serverUniqueIdentifier;
         if (parameter) this.parameter = parameter;
     }
 }

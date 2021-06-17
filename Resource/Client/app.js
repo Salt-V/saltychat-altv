@@ -136,7 +136,7 @@ export class SaltyVoice {
         if (!this.VoiceClients.has(playerId))
             return;
         let voiceClient = this.VoiceClients.get(playerId);
-        this.executeCommand(new PluginCommand(Command.removePlayer, this.serverIdentifier, new PlayerState(voiceClient.teamSpeakName)));
+        this.executeCommand(new PluginCommand(Command.removePlayer, new PlayerState(voiceClient.teamSpeakName)));
         this.VoiceClients.delete(playerId);
         this._clientIdMap.delete(voiceClient.teamSpeakName);
     }
@@ -153,13 +153,13 @@ export class SaltyVoice {
             signalDistortion = native.getZoneScumminess(native.getZoneAtCoords(alt.Player.local.pos.x, alt.Player.local.pos.y, alt.Player.local.pos.z))
                 + native.getZoneScumminess(native.getZoneAtCoords(position.x, position.y, position.z));
         }
-        this.executeCommand(new PluginCommand(Command.phoneCommunicationUpdate, this.serverIdentifier, new PhoneCommunication(voiceClient.teamSpeakName, true, signalDistortion)));
+        this.executeCommand(new PluginCommand(Command.phoneCommunicationUpdate, new PhoneCommunication(voiceClient.teamSpeakName, true, signalDistortion)));
     }
     onServerPhoneEnd(playerId) {
         if (!this.VoiceClients.has(playerId))
             return;
         let voiceClient = this.VoiceClients.get(playerId);
-        this.executeCommand(new PluginCommand(Command.stopPhoneCommunication, this.serverIdentifier, new PhoneCommunication(voiceClient.teamSpeakName, true)));
+        this.executeCommand(new PluginCommand(Command.stopPhoneCommunication, new PhoneCommunication(voiceClient.teamSpeakName, true)));
     }
     onServerRadioSetChannel(radioChannel, isPrimary) {
         if (isPrimary)
@@ -200,19 +200,23 @@ export class SaltyVoice {
         else
             return;
         if (isSending) {
-            this.executeCommand(new PluginCommand(Command.radioCommunicationUpdate, this.serverIdentifier, new RadioCommunication(teamspeakName, Config.radioRange, Config.radioRange, stateChange, this._radioConfiguration.secondaryChannel == radioChannel, direct, relays, this._radioConfiguration.volume)));
+            this.executeCommand(new PluginCommand(Command.radioCommunicationUpdate, new RadioCommunication(teamspeakName, Config.radioRange, Config.radioRange, stateChange, this._radioConfiguration.secondaryChannel == radioChannel, direct, relays, this._radioConfiguration.volume)));
         }
         else {
-            this.executeCommand(new PluginCommand(Command.stopRadioCommunication, this.serverIdentifier, new RadioCommunication(teamspeakName, RadioType.none, RadioType.none, stateChange, this._radioConfiguration.secondaryChannel == radioChannel, direct)));
+            this.executeCommand(new PluginCommand(Command.stopRadioCommunication, new RadioCommunication(teamspeakName, RadioType.none, RadioType.none, stateChange, this._radioConfiguration.secondaryChannel == radioChannel, direct)));
         }
     }
     onServerUpdateRadioTowers(radioTowers) {
+        if (!this._configuration)
+            return;
         this._configuration.radioTowers = radioTowers;
         if (this._gameInstanceState != GameInstanceState.connected)
             return;
-        this.executeCommand(new PluginCommand(Command.radioTowerUpdate, this.serverIdentifier, new RadioTowers(radioTowers)));
+        this.executeCommand(new PluginCommand(Command.radioTowerUpdate, new RadioTowers(radioTowers)));
     }
     onServerIsUsingMegaphone(player, range, isSending, position) {
+        if (this._gameInstanceState <= 0 || !this._configuration)
+            return;
         let name = null;
         if (player.id == alt.Player.local.id) {
             name = this._configuration.teamSpeakName;
@@ -228,7 +232,7 @@ export class SaltyVoice {
         }
         else
             return;
-        this.executeCommand(new PluginCommand(isSending ? Command.megaphoneCommunicationUpdate : Command.stopMegaphoneCommunication, this.serverIdentifier, new MegaphoneCommunication(name, range)));
+        this.executeCommand(new PluginCommand(isSending ? Command.megaphoneCommunicationUpdate : Command.stopMegaphoneCommunication, new MegaphoneCommunication(name, range)));
     }
     onConnected() {
         this._gameInstanceState = GameInstanceState.connected;
@@ -247,7 +251,7 @@ export class SaltyVoice {
         switch (message.Command) {
             case Command.pluginState:
                 alt.emitServer(ToServer.checkVersion, message.Parameter.Version);
-                this.executeCommand(new PluginCommand(Command.radioTowerUpdate, this.serverIdentifier, new RadioTowers(this._configuration.radioTowers)));
+                this.executeCommand(new PluginCommand(Command.radioTowerUpdate, new RadioTowers(this._configuration.radioTowers)));
                 break;
             case Command.reset:
                 this._gameInstanceState = GameInstanceState.notInitiated;
@@ -255,7 +259,7 @@ export class SaltyVoice {
                 this.initializePlugin();
                 break;
             case Command.ping:
-                this.executeCommand(new PluginCommand(Command.pong, this.serverIdentifier));
+                this.executeCommand(new PluginCommand(Command.pong));
                 break;
             case Command.instanceState:
                 this._gameInstanceState = message.Parameter.State;
@@ -288,17 +292,26 @@ export class SaltyVoice {
         alt.logError(JSON.stringify(error));
     }
     executeCommand(command) {
+        if (!this.serverIdentifier)
+            return;
+        command.serverUniqueIdentifier = this.serverIdentifier;
         this._webView.emit("runCommand", JSON.stringify(command));
     }
     playSound(fileName, loop = false, handle = null) {
+        if (this._gameInstanceState <= 0 || !this._configuration)
+            return;
         if (!handle)
             handle = fileName;
-        this.executeCommand(new PluginCommand(Command.playSound, this.serverIdentifier, new Sound(fileName, loop, handle)));
+        this.executeCommand(new PluginCommand(Command.playSound, new Sound(fileName, loop, handle)));
     }
     stopSound(handle) {
-        this.executeCommand(new PluginCommand(Command.stopSound, this.serverIdentifier, new Sound(handle)));
+        if (this._gameInstanceState <= 0 || !this._configuration)
+            return;
+        this.executeCommand(new PluginCommand(Command.stopSound, new Sound(handle)));
     }
     onTick() {
+        if (this._gameInstanceState <= 0 || !this._configuration)
+            return;
         if (alt.Player.local.health > 100)
             this.controlTick();
         this.stateUpdateTick();
@@ -309,8 +322,6 @@ export class SaltyVoice {
         }
     }
     stateUpdateTick() {
-        if (this._gameInstanceState <= 0 || !this._configuration)
-            return;
         let playerStates = [];
         let localRoomId = native.getRoomKeyFromEntity(alt.Player.local.scriptID);
         let localScriptId = alt.Player.local.scriptID;
@@ -350,11 +361,11 @@ export class SaltyVoice {
                 playerStates.push(new PlayerState(voiceClient.teamSpeakName, voiceClient.lastPosition, voiceClient.voiceRange, voiceClient.isAlive, voiceClient.distanceCulled, muffleIntensity));
             }
         });
-        this.executeCommand(new PluginCommand(Command.bulkUpdate, this.serverIdentifier, new BulkUpdate(playerStates, new SelfState(alt.Player.local.pos, native.getGameplayCamRot(0).z))));
+        this.executeCommand(new PluginCommand(Command.bulkUpdate, new BulkUpdate(playerStates, new SelfState(alt.Player.local.pos, native.getGameplayCamRot(0).z))));
     }
     setPlayerTalking(teamSpeakName, isTalking) {
         let playerId = null;
-        if (teamSpeakName == this._configuration.teamSpeakName)
+        if (this._configuration && teamSpeakName == this._configuration.teamSpeakName)
             playerId = alt.Player.local.scriptID;
         else {
             let voiceClient = this.VoiceClients.get(this._clientIdMap.get(teamSpeakName));
@@ -369,7 +380,7 @@ export class SaltyVoice {
         }
     }
     initializePlugin() {
-        this.executeCommand(new PluginCommand(Command.initiate, this.serverIdentifier, new GameInstance(this.serverIdentifier, this._configuration.teamSpeakName, this._configuration.ingameChannel, this._configuration.ingameChannelPassword, this._configuration.soundPack, this._configuration.swissChannels, this._configuration.requestTalkStates, this._configuration.requestRadioTrafficStates, this._configuration.radioRangeUltraShort, this._configuration.radioRangeShort, this._configuration.radioRangeLong)));
+        this.executeCommand(new PluginCommand(Command.initiate, new GameInstance(this.serverIdentifier, this._configuration.teamSpeakName, this._configuration.ingameChannel, this._configuration.ingameChannelPassword, this._configuration.soundPack, this._configuration.swissChannels, this._configuration.requestTalkStates, this._configuration.requestRadioTrafficStates, this._configuration.radioRangeUltraShort, this._configuration.radioRangeShort, this._configuration.radioRangeLong)));
     }
     onClientUseRadio(primaryRadio, isSending) {
         if (primaryRadio) {

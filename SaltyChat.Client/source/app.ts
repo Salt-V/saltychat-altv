@@ -43,7 +43,7 @@ export class SaltyVoice {
     private _voiceRange: number;
     private _webView: alt.WebView;
 
-    public get serverIdentifier(): string {
+    private get serverIdentifier(): string {
         return this._configuration ? this._configuration.serverIdentifier : null;
     };
 
@@ -167,7 +167,7 @@ export class SaltyVoice {
     private onServerRemoveClient(playerId: number): void {
         if (!this.VoiceClients.has(playerId)) return;
         let voiceClient = this.VoiceClients.get(playerId);
-        this.executeCommand(new PluginCommand(Command.removePlayer, this.serverIdentifier, new PlayerState(voiceClient.teamSpeakName)));
+        this.executeCommand(new PluginCommand(Command.removePlayer, new PlayerState(voiceClient.teamSpeakName)));
         this.VoiceClients.delete(playerId);
         this._clientIdMap.delete(voiceClient.teamSpeakName);
     }
@@ -190,7 +190,6 @@ export class SaltyVoice {
         this.executeCommand(
             new PluginCommand(
                 Command.phoneCommunicationUpdate,
-                this.serverIdentifier,
                 new PhoneCommunication(
                     voiceClient.teamSpeakName,
                     true,
@@ -206,7 +205,6 @@ export class SaltyVoice {
         this.executeCommand(
             new PluginCommand(
                 Command.stopPhoneCommunication,
-                this.serverIdentifier,
                 new PhoneCommunication(
                     voiceClient.teamSpeakName,
                     true
@@ -254,7 +252,6 @@ export class SaltyVoice {
             this.executeCommand(
                 new PluginCommand(
                     Command.radioCommunicationUpdate,
-                    this.serverIdentifier,
                     new RadioCommunication(
                         teamspeakName,
                         Config.radioRange,
@@ -271,7 +268,6 @@ export class SaltyVoice {
             this.executeCommand(
                 new PluginCommand(
                     Command.stopRadioCommunication,
-                    this.serverIdentifier,
                     new RadioCommunication(
                         teamspeakName,
                         RadioType.none,
@@ -286,13 +282,15 @@ export class SaltyVoice {
     }
 
     private onServerUpdateRadioTowers(radioTowers: RadioTower[]): void {
+        if (!this._configuration) return;
         this._configuration.radioTowers = radioTowers;
         if (this._gameInstanceState != GameInstanceState.connected) return;
-        this.executeCommand(new PluginCommand(Command.radioTowerUpdate, this.serverIdentifier, new RadioTowers(radioTowers)));
+        this.executeCommand(new PluginCommand(Command.radioTowerUpdate, new RadioTowers(radioTowers)));
     }
 
     // Megaphone
     private onServerIsUsingMegaphone(player: alt.Player, range: number, isSending: boolean, position: alt.Vector3): void {
+        if (this._gameInstanceState <= 0 || !this._configuration) return;
         let name: string = null;
         if (player.id == alt.Player.local.id) {
             name = this._configuration.teamSpeakName;
@@ -309,7 +307,6 @@ export class SaltyVoice {
         this.executeCommand(
             new PluginCommand(
                 isSending ? Command.megaphoneCommunicationUpdate : Command.stopMegaphoneCommunication,
-                this.serverIdentifier,
                 new MegaphoneCommunication(name, range)
             )
         );
@@ -333,7 +330,7 @@ export class SaltyVoice {
         switch (message.Command) {
             case Command.pluginState:
                 alt.emitServer(ToServer.checkVersion, message.Parameter.Version);
-                this.executeCommand(new PluginCommand(Command.radioTowerUpdate, this.serverIdentifier, new RadioTowers(this._configuration.radioTowers)));
+                this.executeCommand(new PluginCommand(Command.radioTowerUpdate, new RadioTowers(this._configuration.radioTowers)));
                 break;
             case Command.reset:
                 this._gameInstanceState = GameInstanceState.notInitiated;
@@ -341,7 +338,7 @@ export class SaltyVoice {
                 this.initializePlugin();
                 break;
             case Command.ping:
-                this.executeCommand(new PluginCommand(Command.pong, this.serverIdentifier));
+                this.executeCommand(new PluginCommand(Command.pong));
                 break;
             case Command.instanceState:
                 this._gameInstanceState = message.Parameter.State;
@@ -379,27 +376,29 @@ export class SaltyVoice {
     }
 
     public executeCommand(command: PluginCommand): void {
+        if (!this.serverIdentifier) return;
+        command.serverUniqueIdentifier = this.serverIdentifier;
         this._webView.emit("runCommand", JSON.stringify(command));
     }
 
     // Sound
 
     private playSound(fileName: string, loop: boolean = false, handle: string = null): void {
+        if (this._gameInstanceState <= 0 || !this._configuration) return;
         if (!handle) handle = fileName;
         this.executeCommand(
             new PluginCommand(
                 Command.playSound,
-                this.serverIdentifier,
                 new Sound(fileName, loop, handle)
             )
         );
     }
 
     private stopSound(handle: string): void {
+        if (this._gameInstanceState <= 0 || !this._configuration) return;
         this.executeCommand(
             new PluginCommand(
                 Command.stopSound,
-                this.serverIdentifier,
                 new Sound(handle)
             )
         );
@@ -407,6 +406,7 @@ export class SaltyVoice {
 
     // Internals
     private onTick(): void {
+        if (this._gameInstanceState <= 0 || !this._configuration) return;
         if (alt.Player.local.health > 100) this.controlTick();
         this.stateUpdateTick();
     }
@@ -418,7 +418,6 @@ export class SaltyVoice {
     }
 
     private stateUpdateTick(): void {
-        if (this._gameInstanceState <= 0 || !this._configuration) return;
         let playerStates = [];
 
         let localRoomId = native.getRoomKeyFromEntity(alt.Player.local.scriptID);
@@ -476,7 +475,6 @@ export class SaltyVoice {
         this.executeCommand(
             new PluginCommand(
                 Command.bulkUpdate,
-                this.serverIdentifier,
                 new BulkUpdate(
                     playerStates,
                     new SelfState(
@@ -490,7 +488,7 @@ export class SaltyVoice {
 
     private setPlayerTalking(teamSpeakName: string, isTalking: boolean): void {
         let playerId = null;
-        if (teamSpeakName == this._configuration.teamSpeakName) playerId = alt.Player.local.scriptID;
+        if (this._configuration && teamSpeakName == this._configuration.teamSpeakName) playerId = alt.Player.local.scriptID;
         else {
             let voiceClient = this.VoiceClients.get(this._clientIdMap.get(teamSpeakName));
             if (voiceClient != null) playerId = voiceClient.player.scriptID;
@@ -506,7 +504,6 @@ export class SaltyVoice {
         this.executeCommand(
             new PluginCommand(
                 Command.initiate,
-                this.serverIdentifier,
                 new GameInstance(
                     this.serverIdentifier,
                     this._configuration.teamSpeakName,

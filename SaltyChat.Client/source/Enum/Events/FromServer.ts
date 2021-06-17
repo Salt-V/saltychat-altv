@@ -11,6 +11,6 @@ export enum FromServer {
     radioLeaveChannel = "SaltyChat:RadioLeaveChannel",
     playerIsSending = "SaltyChat:PlayerIsSending",
     playerIsSendingRelayed = "SaltyChat:PlayerIsSendingRelayed",
-    updateRadioTowers = "SaltyChat:UpdateRadioTowers", // ToDo
+    updateRadioTowers = "SaltyChat:UpdateRadioTowers",
     isUsingMegaphone = "SaltyChat:IsUsingMegaphone"
 }
