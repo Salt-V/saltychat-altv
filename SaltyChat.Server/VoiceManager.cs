@@ -3,12 +3,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AltV.Net;
 using AltV.Net.Async;
 using AltV.Net.Elements.Entities;
-using Newtonsoft.Json;
 using SaltyChat.Server.Models;
 using SaltyChat.Server.Writables;
 
@@ -18,7 +18,7 @@ namespace SaltyChat.Server
     {
         #region Useless things.. But I like them
 
-        private const string Version = "1.0.8"; // ToDo: Change on update
+        private const string Version = "1.0.9"; // ToDo: Change on update
 
         #endregion
 
@@ -52,20 +52,17 @@ namespace SaltyChat.Server
         public VoiceManager()
         {
             var configFile = Path.Combine(Alt.Server.RootDirectory, "resources", Alt.Server.Resource.Name, "config.json");
-            if (File.Exists(configFile))
+            if (!File.Exists(configFile)) throw new FileNotFoundException("Missing config.json");
+
+            try
             {
-                try
-                {
-                    Configuration = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(configFile));
-                    Alt.Log("[SaltyChat] Loaded configuration from config.json");
-                    Alt.Log($"[SaltyChat] Server Identifier: {Configuration.ServerIdentifier}");
-                    Alt.Log($"[SaltyChat] Version: {Version}");
-                }
-                catch (Exception ex)
-                {
-                    Alt.Log("[SaltyChat] Failed loading configuration from config.json: " + ex);
-                    Environment.FailFast("Failed loading configuration from config.json", ex);
-                }
+                Configuration = JsonSerializer.Deserialize<Configuration>(File.ReadAllText(configFile));
+                Alt.Log($"[SaltyChat] New status: enabled. Version: {Version}. Server-ID: {Configuration.ServerIdentifier}");
+            }
+            catch (Exception ex)
+            {
+                Alt.Log("[SaltyChat] Failed loading configuration from config.json: " + ex);
+                Environment.FailFast("Failed loading configuration from config.json", ex);
             }
 
             Instance = this;
@@ -233,7 +230,7 @@ namespace SaltyChat.Server
 
         private async void OnServerUpdateRadioTowers(string radioTowersStr)
         {
-            Configuration.RadioTowers = JsonConvert.DeserializeObject<RadioTower[]>(radioTowersStr);
+            Configuration.RadioTowers = JsonSerializer.Deserialize<RadioTower[]>(radioTowersStr);
             var clientRadioTowers = new ClientRadioTowers(Configuration.RadioTowers);
             AltAsync.EmitAllClients("SaltyChat:UpdateRadioTowers", clientRadioTowers);
 

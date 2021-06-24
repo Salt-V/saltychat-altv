@@ -436,7 +436,7 @@ export class SaltyVoice {
                         voiceClient.isAlive,
                         voiceClient.distanceCulled,
                         null
-                    ))
+                    ));
                 }
             } else {
                 if (voiceClient.distanceCulled) voiceClient.distanceCulled = false;

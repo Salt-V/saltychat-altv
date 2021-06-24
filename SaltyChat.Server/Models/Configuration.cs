@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace SaltyChat.Server.Models
+﻿namespace SaltyChat.Server.Models
 {
     public class Configuration
     {

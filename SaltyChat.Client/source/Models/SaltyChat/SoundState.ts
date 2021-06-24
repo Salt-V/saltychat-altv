@@ -8,14 +8,14 @@ export class SoundState {
     public usingMegaphone: boolean = false;
 
     public get microphone(): DeviceState {
-        if (!this.microphoneEnabled) return DeviceState.Disabled;
-        else if (this.microphoneMuted) return DeviceState.Muted;
-        else return DeviceState.Enabled;
+        if (!this.microphoneEnabled) return DeviceState.disabled;
+        else if (this.microphoneMuted) return DeviceState.muted;
+        else return DeviceState.enabled;
     }
 
     public get speaker(): DeviceState {
-        if (!this.soundEnabled) return DeviceState.Disabled;
-        else if (this.soundMuted) return DeviceState.Muted;
-        else return DeviceState.Enabled;
+        if (!this.soundEnabled) return DeviceState.disabled;
+        else if (this.soundMuted) return DeviceState.muted;
+        else return DeviceState.enabled;
     }
 }

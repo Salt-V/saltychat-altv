@@ -8,12 +8,11 @@ namespace SaltyChat.Server
         public override void OnStart()
         {
             var voiceManager = new VoiceManager();
-            Alt.Log("Salty Voice enabled.");
         }
 
         public override void OnStop()
         {
-            Alt.Log("Salty Voice disabled.");
+            Alt.Log("[SaltyChat] New status: disabled");
         }
     }
 }

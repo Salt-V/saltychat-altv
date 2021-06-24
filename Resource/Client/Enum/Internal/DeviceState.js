@@ -1,6 +1,6 @@
 export var DeviceState;
 (function (DeviceState) {
-    DeviceState[DeviceState["Enabled"] = 0] = "Enabled";
-    DeviceState[DeviceState["Muted"] = 1] = "Muted";
-    DeviceState[DeviceState["Disabled"] = 2] = "Disabled";
+    DeviceState[DeviceState["enabled"] = 0] = "enabled";
+    DeviceState[DeviceState["muted"] = 1] = "muted";
+    DeviceState[DeviceState["disabled"] = 2] = "disabled";
 })(DeviceState || (DeviceState = {}));
