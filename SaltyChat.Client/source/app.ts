@@ -43,7 +43,7 @@ export class SaltyVoice {
     private _voiceRange: number;
     private _webView: alt.WebView;
     private _webSocket: alt.WebSocketClient;
-    private isConnected: boolean = false;
+    private _isConnected: boolean = false;
 
     private get serverIdentifier(): string {
         return this._configuration ? this._configuration.serverIdentifier : null;
@@ -319,14 +319,14 @@ export class SaltyVoice {
 
     // Websocket
     private onConnected(): void {
-        this.isConnected = true;
+        this._isConnected = true;
         this._gameInstanceState = GameInstanceState.connected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
         if (this.serverIdentifier) this.initializePlugin();
     }
 
     private onDisconnected(code: number, reason: string): void {
-        this.isConnected = false;
+        this._isConnected = false;
         this._gameInstanceState = GameInstanceState.notConnected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
     }
@@ -383,7 +383,7 @@ export class SaltyVoice {
     }
 
     public executeCommand(command: PluginCommand): void {
-        if (!this.isConnected) return;
+        if (!this._isConnected) return;
         if (!this.serverIdentifier) return;
         command.serverUniqueIdentifier = this.serverIdentifier;
         this._webSocket.send(JSON.stringify(command));

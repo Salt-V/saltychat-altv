@@ -31,7 +31,7 @@ export class SaltyVoice {
         this._soundState = new SoundState;
         this._gameInstanceState = GameInstanceState.notInitiated;
         this.VoiceClients = new Map();
-        this.isConnected = false;
+        this._isConnected = false;
         if (SaltyVoice._instance != null)
             return;
         alt.on("gameEntityCreate", this.onGameEntityCreate.bind(this));
@@ -239,14 +239,14 @@ export class SaltyVoice {
         this.executeCommand(new PluginCommand(isSending ? Command.megaphoneCommunicationUpdate : Command.stopMegaphoneCommunication, new MegaphoneCommunication(name, range)));
     }
     onConnected() {
-        this.isConnected = true;
+        this._isConnected = true;
         this._gameInstanceState = GameInstanceState.connected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
         if (this.serverIdentifier)
             this.initializePlugin();
     }
     onDisconnected(code, reason) {
-        this.isConnected = false;
+        this._isConnected = false;
         this._gameInstanceState = GameInstanceState.notConnected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
     }
@@ -298,7 +298,7 @@ export class SaltyVoice {
         alt.logError(JSON.stringify(error));
     }
     executeCommand(command) {
-        if (!this.isConnected) return;
+        if (!this._isConnected) return;
         if (!this.serverIdentifier)
             return;
         command.serverUniqueIdentifier = this.serverIdentifier;
