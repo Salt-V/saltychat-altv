@@ -31,6 +31,7 @@ export class SaltyVoice {
         this._soundState = new SoundState;
         this._gameInstanceState = GameInstanceState.notInitiated;
         this.VoiceClients = new Map();
+        this.isConnected = false;
         if (SaltyVoice._instance != null)
             return;
         alt.on("gameEntityCreate", this.onGameEntityCreate.bind(this));
@@ -60,11 +61,14 @@ export class SaltyVoice {
         loadAnimDict("random@arrests").catch((rej) => alt.logError(rej));
         loadAnimDict("mp_facial").catch((rej) => alt.logError(rej));
         loadAnimDict("facials@gen_male@variations@normal").catch((rej) => alt.logError(rej));
-        this._webView = new alt.WebView("http://resource/Client/Public/websocket.html");
-        this._webView.on("onMessage", this.onMessage.bind(this));
-        this._webView.on("onError", this.onError.bind(this));
-        this._webView.on("onConnected", this.onConnected.bind(this));
-        this._webView.on("onDisconnected", this.onDisconnected.bind(this));
+        this._webView = new alt.WebView("http://resource/Client/Public/webview.html");
+        this._webSocket = new alt.WebSocketClient("ws://127.0.0.1:38088/");
+        this._webSocket.autoReconnect = true;
+        this._webSocket.on("message", this.onMessage.bind(this));
+        this._webSocket.on("error", this.onError.bind(this));
+        this._webSocket.on("open", this.onConnected.bind(this));
+        this._webSocket.on("close", this.onDisconnected.bind(this));
+        this._webSocket.start();
     }
     get serverIdentifier() {
         return this._configuration ? this._configuration.serverIdentifier : null;
@@ -235,12 +239,14 @@ export class SaltyVoice {
         this.executeCommand(new PluginCommand(isSending ? Command.megaphoneCommunicationUpdate : Command.stopMegaphoneCommunication, new MegaphoneCommunication(name, range)));
     }
     onConnected() {
+        this.isConnected = true;
         this._gameInstanceState = GameInstanceState.connected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
         if (this.serverIdentifier)
             this.initializePlugin();
     }
-    onDisconnected() {
+    onDisconnected(code, reason) {
+        this.isConnected = false;
         this._gameInstanceState = GameInstanceState.notConnected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
     }
@@ -292,10 +298,11 @@ export class SaltyVoice {
         alt.logError(JSON.stringify(error));
     }
     executeCommand(command) {
+        if (!this.isConnected) return;
         if (!this.serverIdentifier)
             return;
         command.serverUniqueIdentifier = this.serverIdentifier;
-        this._webView.emit("runCommand", JSON.stringify(command));
+        this._webSocket.send(JSON.stringify(command));
     }
     playSound(fileName, loop = false, handle = null) {
         if (this._gameInstanceState <= 0 || !this._configuration)
