@@ -30,8 +30,8 @@ export class SaltyVoice {
         this._radioConfiguration = new RadioConfiguration;
         this._soundState = new SoundState;
         this._gameInstanceState = GameInstanceState.notInitiated;
-        this.VoiceClients = new Map();
         this._isConnected = false;
+        this.VoiceClients = new Map();
         if (SaltyVoice._instance != null)
             return;
         alt.on("gameEntityCreate", this.onGameEntityCreate.bind(this));
@@ -298,7 +298,8 @@ export class SaltyVoice {
         alt.logError(JSON.stringify(error));
     }
     executeCommand(command) {
-        if (!this._isConnected) return;
+        if (!this._isConnected)
+            return;
         if (!this.serverIdentifier)
             return;
         command.serverUniqueIdentifier = this.serverIdentifier;
