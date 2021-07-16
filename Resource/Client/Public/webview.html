@@ -71,54 +71,6 @@
     </div>
 </div>
 <script>
-    let pluginAddress = "127.0.0.1:38088";
-    let isConnected = false;
-    let serverUniqueIdentifierFilter = null;
-    let isErrored = false;
-
-    function connect() {
-        try {
-            window.webSocket = new window.WebSocket(`ws://${pluginAddress}/`);
-
-            webSocket.onmessage = function (evt) {
-                let object = JSON.parse(evt.data);
-
-                if (typeof serverUniqueIdentifierFilter === "string") {
-                    if (object.ServerUniqueIdentifier === serverUniqueIdentifierFilter)
-                        alt.emit("onMessage", evt.data);
-                    else if (typeof object.ServerUniqueIdentifier === "undefined")
-                        alt.emit("onError", evt.data);
-                } else {
-                    if (typeof object.ServerUniqueIdentifier === "string")
-                        alt.emit("onMessage", evt.data);
-                    else
-                        alt.emit("onError", evt.data);
-                }
-            };
-
-            webSocket.onopen = function () {
-                isConnected = true;
-                alt.emit("onConnected");
-            };
-
-            webSocket.onclose = function () {
-                isConnected = false;
-                alt.emit("onDisconnected");
-                setTimeout(() => {
-                    connect();
-                }, 500);
-            }
-        } catch (error) {
-            return;
-        }
-    }
-
-    function runCommand(command) {
-        if (!isConnected || typeof command !== "string") return;
-
-        webSocket.send(command);
-    }
-
     function NUI(state, language = null, ts3ip = null) {
         if (state) {
             $(".tsip").each(function (index) {
@@ -148,14 +100,12 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        connect();
         $(".nui-holder").css("display", "none");
         $(".salty-nui-container").each(function (index) {
             $(this).css("display", "none");
         });
     });
 
-    alt.on('runCommand', runCommand)
     alt.on('showOverlay', NUI)
 </script>
 </body>
