@@ -10,7 +10,7 @@ export class GameInstance {
     public ultraShortRangeDistance: number;
     public shortRangeDistance: number;
     public longRangeDistance: number;
-    public readonly versionInfo: string = "1.0.9"; // ToDo: Change on update
+    public readonly versionInfo: string = "1.1.0"; // ToDo: Change on update
 
     constructor(serverUniqueIdentifier: string, name: string, channelId: number, channelPassword: string,
                 soundPack: string, swissChannels: number[], sendTalkStates: boolean, sendRadioTrafficStates: boolean,

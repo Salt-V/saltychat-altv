@@ -42,6 +42,8 @@ export class SaltyVoice {
     private _gameInstanceState: GameInstanceState = GameInstanceState.notInitiated;
     private _voiceRange: number;
     private _webView: alt.WebView;
+    private _webSocket: alt.WebSocketClient;
+    private _isConnected: boolean = false;
 
     private get serverIdentifier(): string {
         return this._configuration ? this._configuration.serverIdentifier : null;
@@ -87,11 +89,16 @@ export class SaltyVoice {
         loadAnimDict("facials@gen_male@variations@normal").catch((rej) => alt.logError(rej));
 
         // WebView
-        this._webView = new alt.WebView("http://resource/Client/Public/websocket.html");
-        this._webView.on("onMessage", this.onMessage.bind(this));
-        this._webView.on("onError", this.onError.bind(this));
-        this._webView.on("onConnected", this.onConnected.bind(this));
-        this._webView.on("onDisconnected", this.onDisconnected.bind(this));
+        this._webView = new alt.WebView("http://resource/Client/Public/webview.html");
+        
+        // WebSocket
+        this._webSocket = new alt.WebSocketClient("ws://127.0.0.1:38088/");
+        this._webSocket.autoReconnect = true;
+        this._webSocket.on("message", this.onMessage.bind(this));
+        this._webSocket.on("error", this.onError.bind(this));
+        this._webSocket.on("open", this.onConnected.bind(this));
+        this._webSocket.on("close", this.onDisconnected.bind(this));
+        this._webSocket.start();
     }
 
     public static GetInstance(): SaltyVoice {
@@ -314,12 +321,14 @@ export class SaltyVoice {
 
     // Websocket
     private onConnected(): void {
+        this._isConnected = true;
         this._gameInstanceState = GameInstanceState.connected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
         if (this.serverIdentifier) this.initializePlugin();
     }
 
-    private onDisconnected(): void {
+    private onDisconnected(code: number, reason: string): void {
+        this._isConnected = false;
         this._gameInstanceState = GameInstanceState.notConnected;
         alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
     }
@@ -376,9 +385,10 @@ export class SaltyVoice {
     }
 
     public executeCommand(command: PluginCommand): void {
+        if (!this._isConnected) return;
         if (!this.serverIdentifier) return;
         command.serverUniqueIdentifier = this.serverIdentifier;
-        this._webView.emit("runCommand", JSON.stringify(command));
+        this._webSocket.send(JSON.stringify(command));
     }
 
     // Sound
