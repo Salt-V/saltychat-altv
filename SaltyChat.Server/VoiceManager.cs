@@ -16,14 +16,9 @@ namespace SaltyChat.Server
 {
     public class VoiceManager
     {
-        #region Useless things.. But I like them
-
-        private const string Version = "1.0.10"; // ToDo: Change on update
-
-        #endregion
 
         #region Properties
-
+        
         public static VoiceManager Instance { get; private set; }
 
         public static Configuration Configuration { get; private set; }
@@ -44,6 +39,7 @@ namespace SaltyChat.Server
 
         private readonly ConcurrentDictionary<IPlayer, VoiceClient> _voiceClients = new ConcurrentDictionary<IPlayer, VoiceClient>();
         private readonly List<RadioChannel> _radioChannels = new List<RadioChannel>();
+        private const string _Version = "1.1.0"; // ToDo: Change on update
 
         #endregion
 
@@ -57,7 +53,7 @@ namespace SaltyChat.Server
             try
             {
                 Configuration = JsonSerializer.Deserialize<Configuration>(File.ReadAllText(configFile));
-                Alt.Log($"[SaltyChat] New status: enabled. Version: {Version}. Server-ID: {Configuration.ServerIdentifier}");
+                Alt.Log($"[SaltyChat] New status: enabled. Version: {_Version}. Server-ID: {Configuration.ServerIdentifier}");
             }
             catch (Exception ex)
             {

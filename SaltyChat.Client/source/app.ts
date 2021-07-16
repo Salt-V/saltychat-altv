@@ -90,6 +90,8 @@ export class SaltyVoice {
 
         // WebView
         this._webView = new alt.WebView("http://resource/Client/Public/webview.html");
+        
+        // WebSocket
         this._webSocket = new alt.WebSocketClient("ws://127.0.0.1:38088/");
         this._webSocket.autoReconnect = true;
         this._webSocket.on("message", this.onMessage.bind(this));
