@@ -1,4 +1,4 @@
-**If you don't know how to work with C# or TypeScript, use the [pre-built resource](https://github.com/deluvas1911/saltychat-altv/releases) which is an ready2go pack with config files.
+**If you don't know how to work with C# or TypeScript, use the [pre-built resource](https://github.com/deluvas1911/saltychat-altv/releases) which is an ready2go pack with config files.**
 
 # Read me before use
 Read the [license](https://github.com/deluvas1911/saltychat-altv/blob/master/LICENSE) before using this script.\
