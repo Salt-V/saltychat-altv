@@ -1,9 +1,8 @@
 ﻿using AltV.Net;
-using AltV.Net.Async;
 
 namespace SaltyChat.Server
 {
-    public class Voice : AsyncResource
+    public class Voice : Resource
     {
         public override void OnStart()
         {
