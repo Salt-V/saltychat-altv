@@ -1,6 +1,6 @@
 export class GameInstance {
     constructor(serverUniqueIdentifier, name, channelId, channelPassword, soundPack, swissChannels, sendTalkStates, sendRadioTrafficStates, rRangeUltraShort, rRangeShort, rRangeLong) {
-        this.versionInfo = "1.2.0";
+        this.versionInfo = "1.2.1";
         this.serverUniqueIdentifier = serverUniqueIdentifier;
         this.name = name;
         this.channelId = channelId;
