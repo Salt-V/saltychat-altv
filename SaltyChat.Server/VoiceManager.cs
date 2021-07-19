@@ -23,8 +23,9 @@ namespace SaltyChat.Server
         public IEnumerable<VoiceClient> VoiceClients => _voiceClients.Values;
 
         private readonly Dictionary<IPlayer, VoiceClient> _voiceClients = new();
+        private readonly List<PhoneCall> _phoneCalls = new();
         private readonly List<RadioChannel> _radioChannels = new();
-        private const string _Version = "1.2.0"; // ToDo: Change on update
+        private const string _Version = "1.2.1"; // ToDo: Change on update
 
         #endregion
 
@@ -72,9 +73,9 @@ namespace SaltyChat.Server
             lock (player)
             {
                 Alt.EmitAllClients("SaltyChat:RemoveClient", player.Id);
-                if (!_voiceClients.TryGetValue(player, out var voiceClient)) return;
+                if (!_voiceClients.Remove(player, out var voiceClient)) return;
                 foreach (var radioChannel in _radioChannels) radioChannel.RemoveMember(voiceClient);
-                _voiceClients.Remove(player, out _);
+                foreach (var call in _phoneCalls.Where(c => c.CallerId == player.Id || c.CalledId == player.Id)) EndCall(call);
             }
         }
 
@@ -196,12 +197,21 @@ namespace SaltyChat.Server
         {
             caller.Emit("SaltyChat:PhoneEstablish", called, called.Position);
             called.Emit("SaltyChat:PhoneEstablish", caller, caller.Position);
+            _phoneCalls.Add(new PhoneCall(caller, called));
         }
 
         private void OnServerEndCall(IPlayer caller, IPlayer called)
         {
-            if (caller.Exists) caller.Emit("SaltyChat:PhoneEnd", called.Id);
-            if (called.Exists) called.Emit("SaltyChat:PhoneEnd", caller.Id);
+            var phoneCall = _phoneCalls.FirstOrDefault(c => c.Caller == caller && c.Called == called);
+            if (phoneCall == null) return;
+            EndCall(phoneCall);
+        }
+
+        private void EndCall(PhoneCall phoneCall)
+        {
+            if (phoneCall.Caller is {Exists: true}) phoneCall.Caller.Emit("SaltyChat:PhoneEnd", phoneCall.CalledId);
+            if (phoneCall.Called is {Exists: true}) phoneCall.Called.Emit("SaltyChat:PhoneEnd", phoneCall.CallerId);
+            _phoneCalls.Remove(phoneCall);
         }
 
         #endregion
