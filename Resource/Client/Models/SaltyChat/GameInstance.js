@@ -10,7 +10,7 @@ export class GameInstance {
     ultraShortRangeDistance;
     shortRangeDistance;
     longRangeDistance;
-    versionInfo = "1.2.1";
+    versionInfo = "1.3.0";
     constructor(serverUniqueIdentifier, name, channelId, channelPassword, soundPack, swissChannels, sendTalkStates, sendRadioTrafficStates, rRangeUltraShort, rRangeShort, rRangeLong) {
         this.serverUniqueIdentifier = serverUniqueIdentifier;
         this.name = name;

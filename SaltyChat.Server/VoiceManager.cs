@@ -25,7 +25,7 @@ namespace SaltyChat.Server
         private readonly Dictionary<IPlayer, VoiceClient> _voiceClients = new();
         private readonly List<PhoneCall> _phoneCalls = new();
         private readonly List<RadioChannel> _radioChannels = new();
-        private const string _Version = "1.2.1"; // ToDo: Change on update
+        private const string _Version = "1.3.0"; // ToDo: Change on update
 
         #endregion
 
