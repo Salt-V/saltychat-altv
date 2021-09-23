@@ -11,10 +11,11 @@
     "clean": "tsc --build --clean"
   },
   "devDependencies": {
-    "@altv/types-client": "^1.5.2",
-    "@altv/types-natives": "^1.1.0",
-    "@types/node": "^8.0.14",
-    "tsc": "^1.20150623.0",
-    "typescript": "^3.2.2"
+    "@altv/types-client": "^1.8.4",
+    "@altv/types-natives": "^1.4.2",
+    "@altv/types-shared": "^1.0.4",
+    "@types/node": "^16.9.6",
+    "tsc": "2.0.3",
+    "typescript": "latest"
   }
 }
