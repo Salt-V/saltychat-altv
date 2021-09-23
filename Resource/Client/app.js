@@ -24,14 +24,23 @@ import { FromClient } from "./Enum/Events/FromClient";
 import { ToClient } from "./Enum/Events/ToClient";
 import { ToServer } from "./Enum/Events/ToServer";
 export class SaltyVoice {
+    static _instance = null;
+    _streamedClients = new Set();
+    _configuration;
+    _clientIdMap = new Map();
+    _radioConfiguration = new RadioConfiguration;
+    _soundState = new SoundState;
+    _gameInstanceState = GameInstanceState.notInitiated;
+    _voiceRange;
+    _webView;
+    _webSocket;
+    _isConnected = false;
+    get serverIdentifier() {
+        return this._configuration ? this._configuration.serverIdentifier : null;
+    }
+    ;
+    VoiceClients = new Map();
     constructor() {
-        this._streamedClients = new Set();
-        this._clientIdMap = new Map();
-        this._radioConfiguration = new RadioConfiguration;
-        this._soundState = new SoundState;
-        this._gameInstanceState = GameInstanceState.notInitiated;
-        this._isConnected = false;
-        this.VoiceClients = new Map();
         if (SaltyVoice._instance != null)
             return;
         alt.on("gameEntityCreate", this.onGameEntityCreate.bind(this));
@@ -70,10 +79,6 @@ export class SaltyVoice {
         this._webSocket.on("close", this.onDisconnected.bind(this));
         this._webSocket.start();
     }
-    get serverIdentifier() {
-        return this._configuration ? this._configuration.serverIdentifier : null;
-    }
-    ;
     static GetInstance() {
         if (SaltyVoice._instance == null)
             SaltyVoice._instance = new SaltyVoice();
@@ -447,5 +452,4 @@ export class SaltyVoice {
         this.stopSound(handle);
     }
 }
-SaltyVoice._instance = null;
 SaltyVoice.GetInstance();

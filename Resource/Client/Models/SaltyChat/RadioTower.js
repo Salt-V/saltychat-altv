@@ -1,4 +1,8 @@
 export class RadioTower {
+    x;
+    y;
+    z;
+    range;
     constructor(x, y, z, range = 8000) {
         this.x = x;
         this.y = y;
@@ -7,6 +11,7 @@ export class RadioTower {
     }
 }
 export class RadioTowers {
+    towers;
     constructor(towers) {
         this.towers = towers;
     }

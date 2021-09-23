@@ -3,6 +3,12 @@ import { Command } from "../../Enum/SaltyChat/Command";
 import { PlayerState } from "./PlayerState";
 import { SaltyVoice } from "../../app";
 export class VoiceClient {
+    player;
+    teamSpeakName;
+    voiceRange;
+    isAlive;
+    lastPosition;
+    distanceCulled;
     constructor(player, teamSpeakName, voiceRange, isAlive, lastPosition) {
         this.player = player;
         this.teamSpeakName = teamSpeakName;

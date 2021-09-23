@@ -1,12 +1,10 @@
 import { DeviceState } from "../../Enum/Internal/DeviceState";
 export class SoundState {
-    constructor() {
-        this.microphoneMuted = false;
-        this.microphoneEnabled = false;
-        this.soundMuted = false;
-        this.soundEnabled = false;
-        this.usingMegaphone = false;
-    }
+    microphoneMuted = false;
+    microphoneEnabled = false;
+    soundMuted = false;
+    soundEnabled = false;
+    usingMegaphone = false;
     get microphone() {
         if (!this.microphoneEnabled)
             return DeviceState.disabled;
