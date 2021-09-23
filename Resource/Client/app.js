@@ -374,7 +374,7 @@ export class SaltyVoice {
                 playerStates.push(new PlayerState(voiceClient.teamSpeakName, voiceClient.lastPosition, voiceClient.voiceRange, voiceClient.isAlive, voiceClient.distanceCulled, muffleIntensity));
             }
         });
-        this.executeCommand(new PluginCommand(Command.bulkUpdate, new BulkUpdate(playerStates, new SelfState(alt.Player.local.pos, native.getGameplayCamRot(0).z))));
+        this.executeCommand(new PluginCommand(Command.bulkUpdate, new BulkUpdate(playerStates, new SelfState(alt.Player.local.pos, native.getGameplayCamRot(0).z, this.VoiceClients.has(alt.Player.local.id) ? this.VoiceClients.get(alt.Player.local.id).voiceRange : 0))));
     }
     setPlayerTalking(teamSpeakName, isTalking) {
         let playerId = null;

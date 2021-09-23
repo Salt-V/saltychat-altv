@@ -489,7 +489,8 @@ export class SaltyVoice {
                     playerStates,
                     new SelfState(
                         alt.Player.local.pos,
-                        native.getGameplayCamRot(0).z
+                        native.getGameplayCamRot(0).z,
+                        this.VoiceClients.has(alt.Player.local.id) ? this.VoiceClients.get(alt.Player.local.id).voiceRange : 0
                     )
                 )
             )
