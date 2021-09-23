@@ -23,6 +23,10 @@ export enum Command {
     stopRadioCommunication = 31,
     radioTowerUpdate = 32,
     radioTrafficState = 33,
+
+    addRadioChannelMember = 37,
+    updateRadioChannelMembers = 38,
+    removeRadioChannelMember,
     // Megaphone
     megaphoneCommunicationUpdate = 40,
     stopMegaphoneCommunication = 41
