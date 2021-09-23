@@ -65,7 +65,7 @@
    ],
    "RequestTalkStates":true,
    "RequestRadioTrafficStates":false,
-   "MinimumPluginVersion":"2.3.5",
+   "MinimumPluginVersion":"3.0.0p1",
    "MegaphoneRange":200.0,
    "NamePattern":"{guid}",
    "RadioRangeUltraShort":1800.0,
