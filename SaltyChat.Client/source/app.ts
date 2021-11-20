@@ -6,6 +6,7 @@ import {Config} from "./config";
 // Helpers
 import {loadAnimDict} from "./Helpers/LoadAnimDict";
 import {hasOpening} from "./Helpers/HasOpening";
+import {roomComparison} from "./Helpers/RoomComparison";
 // Models
 import {BulkUpdate} from "./Models/SaltyChat/BulkUpdate";
 import {Configuration} from "./Models/SaltyChat/Configuration";
@@ -430,9 +431,6 @@ export class SaltyVoice {
     private stateUpdateTick(): void {
         let playerStates = [];
 
-        let localRoomId = native.getRoomKeyFromEntity(alt.Player.local.scriptID);
-        let localScriptId = alt.Player.local.scriptID;
-
         this.VoiceClients.forEach((voiceClient) => {
             let nextPlayer = voiceClient.player;
             if (!nextPlayer.valid) return;
@@ -455,17 +453,12 @@ export class SaltyVoice {
 
                 let muffleIntensity = null;
                 if (Config.enableMuffling) {
-                    let npRoomId = native.getRoomKeyFromEntity(nextPlayer.scriptID);
-
-                    if (localRoomId != npRoomId && !native.hasEntityClearLosToEntity(localScriptId, nextPlayer.scriptID, 17)) {
-                        muffleIntensity = 10;
-                    } else {
-                        let pVehicle = alt.Player.local.vehicle;
-                        let nVehicle = nextPlayer.vehicle;
-                        if (pVehicle != nVehicle) {
-                            if (pVehicle && !hasOpening(pVehicle)) muffleIntensity += 4;
-                            if (nVehicle && !hasOpening(nVehicle)) muffleIntensity += 4;
-                        }
+                    muffleIntensity = roomComparison(nextPlayer)
+                    let pVehicle = alt.Player.local.vehicle;
+                    let nVehicle = nextPlayer.vehicle;
+                    if (pVehicle != nVehicle) {
+                        if (pVehicle && !hasOpening(pVehicle)) muffleIntensity += 4;
+                        if (nVehicle && !hasOpening(nVehicle)) muffleIntensity += 4;
                     }
                 }
 
