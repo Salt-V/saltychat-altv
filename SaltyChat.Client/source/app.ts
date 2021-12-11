@@ -106,10 +106,6 @@ export class SaltyVoice {
     alt.on(FromClient.useMegaphone, this.onClientUseMegaphone.bind(this));
     alt.on(FromClient.toggleRange, this.onClientToggleRange.bind(this));
     alt.on(FromClient.setRadioVolume, this.onClientSetRadioVolume.bind(this));
-    alt.on(
-      FromClient.toggleRadioSpeaker,
-      this.onClientToggleRadioSpeaker.bind(this)
-    );
     alt.on(FromClient.playSound, this.onClientPlaySound.bind(this));
     alt.on(FromClient.stopSound, this.onClientStopSound.bind(this));
 
@@ -786,15 +782,6 @@ export class SaltyVoice {
     if (volume < 0) volume = 0;
     else if (volume > 1.6) volume = 1.6;
     this._radioConfiguration.volume = volume;
-  }
-
-  private onClientToggleRadioSpeaker(): void {
-    this._radioConfiguration.speakerEnabled =
-      !this._radioConfiguration.speakerEnabled;
-    alt.emitServer(
-      ToServer.toggleRadioSpeaker,
-      this._radioConfiguration.speakerEnabled
-    );
   }
 
   private onClientPlaySound(
