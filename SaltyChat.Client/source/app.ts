@@ -86,6 +86,10 @@ export class SaltyVoice {
       this.onServerRadioLeaveChannel.bind(this)
     );
     alt.onServer(
+      FromServer.radioChannelMemberUpdated,
+      this.onServerRadioChannelMemberUpdated.bind(this)
+    );
+    alt.onServer(
       FromServer.playerIsSending,
       this.onServerPlayerIsSending.bind(this)
     );
@@ -304,16 +308,28 @@ export class SaltyVoice {
         this.executeCommand(
           new PluginCommand(
             Command.updateRadioChannelmembers,
+            new RadioChannelMemberUpdate([] as string[], true),
             this.serverIdentifier
           )
         );
+        if (Config.enableRadioSound)
+          this.playSound('leaveRadioChannel', false, 'radio');
       }
     } else {
       this._radioConfiguration.secondaryChannel = radioChannel;
+      if (radioChannel) {
+        this.executeCommand(
+          new PluginCommand(
+            Command.updateRadioChannelmembers,
+            new RadioChannelMemberUpdate([] as string[], false),
+            this.serverIdentifier
+          )
+        );
+        if (Config.enableRadioSound)
+          this.playSound('enterRadioChannel', false, 'radio');
+      }
     }
     alt.emit(ToClient.radioChanged, radioChannel, isPrimary);
-    if (Config.enableRadioSound)
-      this.playSound('enterRadioChannel', false, 'radio');
   }
 
   private onServerRadioLeaveChannel(radioChannel: string): void {
@@ -326,6 +342,33 @@ export class SaltyVoice {
     }
     if (Config.enableRadioSound)
       this.playSound('leaveRadioChannel', false, 'radio');
+  }
+
+  private onServerRadioChannelMemberUpdated(
+    channelName: string,
+    channelMembers: any[]
+  ) {
+    let memberArray: string[] = channelMembers.map((m) => {
+      return m;
+    });
+
+    if (this._radioConfiguration.primaryChannel === channelName) {
+      this.executeCommand(
+        new PluginCommand(
+          Command.updateRadioChannelmembers,
+          new RadioChannelMemberUpdate(memberArray, true),
+          this._configuration.serverIdentifier
+        )
+      );
+    } else if (this._radioConfiguration.primaryChannel === channelName) {
+      this.executeCommand(
+        new PluginCommand(
+          Command.updateRadioChannelmembers,
+          new RadioChannelMemberUpdate(memberArray, false),
+          this._configuration.serverIdentifier
+        )
+      );
+    }
   }
 
   private onServerPlayerIsSending(
