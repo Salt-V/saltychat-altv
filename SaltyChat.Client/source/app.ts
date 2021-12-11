@@ -22,6 +22,7 @@ import { SoundState } from './Models/SaltyChat/SoundState';
 import { Sound } from './Models/SaltyChat/Sound';
 import { VoiceClientServer } from './Models/SaltyChat/VoiceClientServer';
 import { VoiceClient } from './Models/SaltyChat/VoiceClient';
+import { RadioChannelMemberUpdate } from './Models/SaltyChat/RadioChannelMemberUpdate';
 // Enums
 import { Command } from './Enum/SaltyChat/Command';
 import { GameInstanceState } from './Enum/SaltyChat/GameInstanceState';
@@ -297,8 +298,19 @@ export class SaltyVoice {
     radioChannel: string,
     isPrimary: boolean
   ): void {
-    if (isPrimary) this._radioConfiguration.primaryChannel = radioChannel;
-    else this._radioConfiguration.secondaryChannel = radioChannel;
+    if (isPrimary) {
+      this._radioConfiguration.primaryChannel = radioChannel;
+      if (radioChannel) {
+        this.executeCommand(
+          new PluginCommand(
+            Command.updateRadioChannelmembers,
+            this.serverIdentifier
+          )
+        );
+      }
+    } else {
+      this._radioConfiguration.secondaryChannel = radioChannel;
+    }
     alt.emit(ToClient.radioChanged, radioChannel, isPrimary);
     if (Config.enableRadioSound)
       this.playSound('enterRadioChannel', false, 'radio');
