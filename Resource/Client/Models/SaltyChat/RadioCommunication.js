@@ -1,7 +1,13 @@
 export class RadioCommunication {
+    name;
+    senderRadioType;
+    ownRadioType;
+    playMicClick;
+    direct;
+    secondary;
+    relayedBy = null;
+    volume = null;
     constructor(name, senderRadioType, ownRadioType, playMicClick, isSecondary, direct, relayedBy, volume) {
-        this.relayedBy = null;
-        this.volume = null;
         this.name = name;
         this.senderRadioType = senderRadioType;
         this.ownRadioType = ownRadioType;

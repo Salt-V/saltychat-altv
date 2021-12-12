@@ -1,8 +1,10 @@
 export class PhoneCommunication {
+    name;
+    signalStrength = null;
+    volume = null;
+    direct;
+    relayedBy = null;
     constructor(name, direct, signalStrength = null, volume = null, relayedBy = null) {
-        this.signalStrength = null;
-        this.volume = null;
-        this.relayedBy = null;
         this.name = name;
         this.direct = direct;
         if (signalStrength != null)

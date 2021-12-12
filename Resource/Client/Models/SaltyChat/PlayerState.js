@@ -1,7 +1,13 @@
 import { MuffleEffect } from "./MuffleEffect";
 export class PlayerState {
+    name;
+    position;
+    voiceRange;
+    isAlive;
+    volumeOverride = null;
+    distanceCulled;
+    muffle;
     constructor(name, position, voiceRange, isAlive, distanceCulled = false, muffleIntensity = null, volumeOverride = null) {
-        this.volumeOverride = null;
         this.name = name;
         if (position)
             this.position = position;

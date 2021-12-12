@@ -1,41 +1,50 @@
-import * as alt from "alt-client";
-import * as native from "natives";
-import { Config } from "./config";
-import { loadAnimDict } from "./Helpers/LoadAnimDict";
-import { hasOpening } from "./Helpers/HasOpening";
-import { BulkUpdate } from "./Models/SaltyChat/BulkUpdate";
-import { GameInstance } from "./Models/SaltyChat/GameInstance";
-import { MegaphoneCommunication } from "./Models/SaltyChat/MegaphoneCommunication";
-import { PhoneCommunication } from "./Models/SaltyChat/PhoneCommunication";
-import { PlayerState } from "./Models/SaltyChat/PlayerState";
-import { PluginCommand } from "./Models/SaltyChat/PluginCommand";
-import { RadioCommunication } from "./Models/SaltyChat/RadioCommunication";
-import { RadioConfiguration } from "./Models/SaltyChat/RadioConfiguration";
-import { RadioTowers } from "./Models/SaltyChat/RadioTower";
-import { SelfState } from "./Models/SaltyChat/SelfState";
-import { SoundState } from "./Models/SaltyChat/SoundState";
-import { Sound } from "./Models/SaltyChat/Sound";
-import { VoiceClient } from "./Models/SaltyChat/VoiceClient";
-import { Command } from "./Enum/SaltyChat/Command";
-import { GameInstanceState } from "./Enum/SaltyChat/GameInstanceState";
-import { RadioType } from "./Enum/SaltyChat/RadioType";
-import { FromServer } from "./Enum/Events/FromServer";
-import { FromClient } from "./Enum/Events/FromClient";
-import { ToClient } from "./Enum/Events/ToClient";
-import { ToServer } from "./Enum/Events/ToServer";
+import * as alt from 'alt-client';
+import * as native from 'natives';
+import { Config } from './config';
+import { loadAnimDict } from './Helpers/LoadAnimDict';
+import { hasOpening } from './Helpers/HasOpening';
+import { BulkUpdate } from './Models/SaltyChat/BulkUpdate';
+import { GameInstance } from './Models/SaltyChat/GameInstance';
+import { MegaphoneCommunication } from './Models/SaltyChat/MegaphoneCommunication';
+import { PhoneCommunication } from './Models/SaltyChat/PhoneCommunication';
+import { PlayerState } from './Models/SaltyChat/PlayerState';
+import { PluginCommand } from './Models/SaltyChat/PluginCommand';
+import { RadioCommunication } from './Models/SaltyChat/RadioCommunication';
+import { RadioConfiguration } from './Models/SaltyChat/RadioConfiguration';
+import { RadioTowers } from './Models/SaltyChat/RadioTower';
+import { SelfState } from './Models/SaltyChat/SelfState';
+import { SoundState } from './Models/SaltyChat/SoundState';
+import { Sound } from './Models/SaltyChat/Sound';
+import { VoiceClient } from './Models/SaltyChat/VoiceClient';
+import { RadioChannelMemberUpdate } from './Models/SaltyChat/RadioChannelMemberUpdate';
+import { Command } from './Enum/SaltyChat/Command';
+import { GameInstanceState } from './Enum/SaltyChat/GameInstanceState';
+import { RadioType } from './Enum/SaltyChat/RadioType';
+import { FromServer } from './Enum/Events/FromServer';
+import { FromClient } from './Enum/Events/FromClient';
+import { ToClient } from './Enum/Events/ToClient';
+import { ToServer } from './Enum/Events/ToServer';
 export class SaltyVoice {
+    static _instance = null;
+    _streamedClients = new Set();
+    _configuration;
+    _clientIdMap = new Map();
+    _radioConfiguration = new RadioConfiguration();
+    _soundState = new SoundState();
+    _gameInstanceState = GameInstanceState.notInitiated;
+    _voiceRange;
+    _webView;
+    _webSocket;
+    _isConnected = false;
+    get serverIdentifier() {
+        return this._configuration ? this._configuration.serverIdentifier : null;
+    }
+    VoiceClients = new Map();
     constructor() {
-        this._streamedClients = new Set();
-        this._clientIdMap = new Map();
-        this._radioConfiguration = new RadioConfiguration;
-        this._soundState = new SoundState;
-        this._gameInstanceState = GameInstanceState.notInitiated;
-        this._isConnected = false;
-        this.VoiceClients = new Map();
         if (SaltyVoice._instance != null)
             return;
-        alt.on("gameEntityCreate", this.onGameEntityCreate.bind(this));
-        alt.on("gameEntityDestroy", this.onGameEntityDestroy.bind(this));
+        alt.on('gameEntityCreate', this.onGameEntityCreate.bind(this));
+        alt.on('gameEntityDestroy', this.onGameEntityDestroy.bind(this));
         alt.onceServer(FromServer.initialize, this.onServerInitialize.bind(this));
         alt.onServer(FromServer.syncClients, this.onServerSyncClients.bind(this));
         alt.onServer(FromServer.updateClient, this.onServerUpdateClient.bind(this));
@@ -46,6 +55,7 @@ export class SaltyVoice {
         alt.onServer(FromServer.phoneEnd, this.onServerPhoneEnd.bind(this));
         alt.onServer(FromServer.radioSetChannel, this.onServerRadioSetChannel.bind(this));
         alt.onServer(FromServer.radioLeaveChannel, this.onServerRadioLeaveChannel.bind(this));
+        alt.onServer(FromServer.radioChannelMemberUpdated, this.onServerRadioChannelMemberUpdated.bind(this));
         alt.onServer(FromServer.playerIsSending, this.onServerPlayerIsSending.bind(this));
         alt.onServer(FromServer.playerIsSendingRelayed, this.onServerPlayerIsSendingRelayed.bind(this));
         alt.onServer(FromServer.updateRadioTowers, this.onServerUpdateRadioTowers.bind(this));
@@ -58,22 +68,18 @@ export class SaltyVoice {
         alt.on(FromClient.playSound, this.onClientPlaySound.bind(this));
         alt.on(FromClient.stopSound, this.onClientStopSound.bind(this));
         alt.setInterval(this.onTick.bind(this), 250);
-        loadAnimDict("random@arrests").catch((rej) => alt.logError(rej));
-        loadAnimDict("mp_facial").catch((rej) => alt.logError(rej));
-        loadAnimDict("facials@gen_male@variations@normal").catch((rej) => alt.logError(rej));
-        this._webView = new alt.WebView("http://resource/Client/Public/webview.html");
-        this._webSocket = new alt.WebSocketClient("ws://127.0.0.1:38088/");
+        loadAnimDict('random@arrests').catch((rej) => alt.logError(rej));
+        loadAnimDict('mp_facial').catch((rej) => alt.logError(rej));
+        loadAnimDict('facials@gen_male@variations@normal').catch((rej) => alt.logError(rej));
+        this._webView = new alt.WebView('http://resource/Client/Public/webview.html');
+        this._webSocket = new alt.WebSocketClient('ws://127.0.0.1:38088/');
         this._webSocket.autoReconnect = true;
-        this._webSocket.on("message", this.onMessage.bind(this));
-        this._webSocket.on("error", this.onError.bind(this));
-        this._webSocket.on("open", this.onConnected.bind(this));
-        this._webSocket.on("close", this.onDisconnected.bind(this));
+        this._webSocket.on('message', this.onMessage.bind(this));
+        this._webSocket.on('error', this.onError.bind(this));
+        this._webSocket.on('open', this.onConnected.bind(this));
+        this._webSocket.on('close', this.onDisconnected.bind(this));
         this._webSocket.start();
     }
-    get serverIdentifier() {
-        return this._configuration ? this._configuration.serverIdentifier : null;
-    }
-    ;
     static GetInstance() {
         if (SaltyVoice._instance == null)
             SaltyVoice._instance = new SaltyVoice();
@@ -95,8 +101,9 @@ export class SaltyVoice {
         this.initialize();
     }
     initialize() {
-        if (Config.enableOverlay && this._gameInstanceState <= GameInstanceState.notConnected) {
-            this._webView.emit("showOverlay", true, Config.overlayLanguage, Config.overlayAddress);
+        if (Config.enableOverlay &&
+            this._gameInstanceState <= GameInstanceState.notConnected) {
+            this._webView.emit('showOverlay', true, Config.overlayLanguage, Config.overlayAddress);
         }
         if (this._gameInstanceState == GameInstanceState.connected)
             this.initializePlugin();
@@ -154,8 +161,9 @@ export class SaltyVoice {
         }
         let signalDistortion = 10;
         if (Config.enableSignalStrength) {
-            signalDistortion = native.getZoneScumminess(native.getZoneAtCoords(alt.Player.local.pos.x, alt.Player.local.pos.y, alt.Player.local.pos.z))
-                + native.getZoneScumminess(native.getZoneAtCoords(position.x, position.y, position.z));
+            signalDistortion =
+                native.getZoneScumminess(native.getZoneAtCoords(alt.Player.local.pos.x, alt.Player.local.pos.y, alt.Player.local.pos.z)) +
+                    native.getZoneScumminess(native.getZoneAtCoords(position.x, position.y, position.z));
         }
         this.executeCommand(new PluginCommand(Command.phoneCommunicationUpdate, new PhoneCommunication(voiceClient.teamSpeakName, true, signalDistortion)));
     }
@@ -166,13 +174,23 @@ export class SaltyVoice {
         this.executeCommand(new PluginCommand(Command.stopPhoneCommunication, new PhoneCommunication(voiceClient.teamSpeakName, true)));
     }
     onServerRadioSetChannel(radioChannel, isPrimary) {
-        if (isPrimary)
+        if (isPrimary) {
             this._radioConfiguration.primaryChannel = radioChannel;
-        else
+            if (radioChannel) {
+                this.executeCommand(new PluginCommand(Command.updateRadioChannelmembers, new RadioChannelMemberUpdate([], true), this.serverIdentifier));
+                if (Config.enableRadioSound)
+                    this.playSound('leaveRadioChannel', false, 'radio');
+            }
+        }
+        else {
             this._radioConfiguration.secondaryChannel = radioChannel;
+            if (radioChannel) {
+                this.executeCommand(new PluginCommand(Command.updateRadioChannelmembers, new RadioChannelMemberUpdate([], false), this.serverIdentifier));
+                if (Config.enableRadioSound)
+                    this.playSound('enterRadioChannel', false, 'radio');
+            }
+        }
         alt.emit(ToClient.radioChanged, radioChannel, isPrimary);
-        if (Config.enableRadioSound)
-            this.playSound("enterRadioChannel", false, "radio");
     }
     onServerRadioLeaveChannel(radioChannel) {
         if (this._radioConfiguration.primaryChannel == radioChannel) {
@@ -184,7 +202,18 @@ export class SaltyVoice {
             alt.emit(ToClient.radioChanged, false, null);
         }
         if (Config.enableRadioSound)
-            this.playSound("leaveRadioChannel", false, "radio");
+            this.playSound('leaveRadioChannel', false, 'radio');
+    }
+    onServerRadioChannelMemberUpdated(channelName, channelMembers) {
+        let memberArray = channelMembers.map((m) => {
+            return m;
+        });
+        if (this._radioConfiguration.primaryChannel === channelName) {
+            this.executeCommand(new PluginCommand(Command.updateRadioChannelmembers, new RadioChannelMemberUpdate(memberArray, true), this._configuration.serverIdentifier));
+        }
+        else if (this._radioConfiguration.primaryChannel === channelName) {
+            this.executeCommand(new PluginCommand(Command.updateRadioChannelmembers, new RadioChannelMemberUpdate(memberArray, false), this._configuration.serverIdentifier));
+        }
     }
     onServerPlayerIsSending(player, radioChannel, isSending, stateChange, position) {
         this.onServerPlayerIsSendingRelayed(player, radioChannel, isSending, stateChange, position, true, []);
@@ -236,7 +265,9 @@ export class SaltyVoice {
         }
         else
             return;
-        this.executeCommand(new PluginCommand(isSending ? Command.megaphoneCommunicationUpdate : Command.stopMegaphoneCommunication, new MegaphoneCommunication(name, range)));
+        this.executeCommand(new PluginCommand(isSending
+            ? Command.megaphoneCommunicationUpdate
+            : Command.stopMegaphoneCommunication, new MegaphoneCommunication(name, range)));
     }
     onConnected() {
         this._isConnected = true;
@@ -270,16 +301,20 @@ export class SaltyVoice {
             case Command.instanceState:
                 this._gameInstanceState = message.Parameter.State;
                 if (Config.enableOverlay) {
-                    this._webView.emit("showOverlay", this._gameInstanceState <= GameInstanceState.notConnected, Config.overlayLanguage, Config.overlayAddress);
+                    this._webView.emit('showOverlay', this._gameInstanceState <= GameInstanceState.notConnected, Config.overlayLanguage, Config.overlayAddress);
                 }
                 alt.emit(ToClient.stateChanged, this._gameInstanceState, this._soundState.microphone, this._soundState.speaker);
                 break;
             case Command.soundState:
-                if (message.Parameter.IsMicrophoneMuted != this._soundState.microphoneMuted) {
-                    this._soundState.microphoneMuted = message.Parameter.IsMicrophoneMuted;
+                if (message.Parameter.IsMicrophoneMuted !=
+                    this._soundState.microphoneMuted) {
+                    this._soundState.microphoneMuted =
+                        message.Parameter.IsMicrophoneMuted;
                 }
-                if (message.Parameter.IsMicrophoneEnabled != this._soundState.microphoneEnabled) {
-                    this._soundState.microphoneEnabled = message.Parameter.IsMicrophoneEnabled;
+                if (message.Parameter.IsMicrophoneEnabled !=
+                    this._soundState.microphoneEnabled) {
+                    this._soundState.microphoneEnabled =
+                        message.Parameter.IsMicrophoneEnabled;
                 }
                 if (message.Parameter.IsSoundMuted != this._soundState.soundMuted) {
                     this._soundState.soundMuted = message.Parameter.IsSoundMuted;
@@ -352,7 +387,8 @@ export class SaltyVoice {
                 let muffleIntensity = null;
                 if (Config.enableMuffling) {
                     let npRoomId = native.getRoomKeyFromEntity(nextPlayer.scriptID);
-                    if (localRoomId != npRoomId && !native.hasEntityClearLosToEntity(localScriptId, nextPlayer.scriptID, 17)) {
+                    if (localRoomId != npRoomId &&
+                        !native.hasEntityClearLosToEntity(localScriptId, nextPlayer.scriptID, 17)) {
                         muffleIntensity = 10;
                     }
                     else {
@@ -369,11 +405,12 @@ export class SaltyVoice {
                 playerStates.push(new PlayerState(voiceClient.teamSpeakName, voiceClient.lastPosition, voiceClient.voiceRange, voiceClient.isAlive, voiceClient.distanceCulled, muffleIntensity));
             }
         });
-        this.executeCommand(new PluginCommand(Command.bulkUpdate, new BulkUpdate(playerStates, new SelfState(alt.Player.local.pos, native.getGameplayCamRot(0).z))));
+        this.executeCommand(new PluginCommand(Command.bulkUpdate, new BulkUpdate(playerStates, new SelfState(alt.Player.local.pos, native.getGameplayCamRot(0).z, this._voiceRange))));
     }
     setPlayerTalking(teamSpeakName, isTalking) {
         let playerId = null;
-        if (this._configuration && teamSpeakName == this._configuration.teamSpeakName)
+        if (this._configuration &&
+            teamSpeakName == this._configuration.teamSpeakName)
             playerId = alt.Player.local.scriptID;
         else {
             let voiceClient = this.VoiceClients.get(this._clientIdMap.get(teamSpeakName));
@@ -382,9 +419,9 @@ export class SaltyVoice {
         }
         if (playerId && Config.enableLipSync) {
             if (isTalking)
-                native.playFacialAnim(playerId, "mic_chatter", "mp_facial");
+                native.playFacialAnim(playerId, 'mic_chatter', 'mp_facial');
             else
-                native.playFacialAnim(playerId, "mood_normal_1", "facials@gen_male@variations@normal");
+                native.playFacialAnim(playerId, 'mood_normal_1', 'facials@gen_male@variations@normal');
         }
     }
     initializePlugin() {
@@ -395,7 +432,7 @@ export class SaltyVoice {
             if (isSending != this._radioConfiguration.usingPrimaryRadio) {
                 alt.emitServer(ToServer.playerIsSending, this._radioConfiguration.primaryChannel, isSending);
                 if (isSending && Config.enableRadioAnimation)
-                    native.taskPlayAnim(alt.Player.local.scriptID, "random@arrests", "generic_radio_enter", 2, 2, -1, 50, 1, false, false, false);
+                    native.taskPlayAnim(alt.Player.local.scriptID, 'random@arrests', 'generic_radio_enter', 2, 2, -1, 50, 1, false, false, false);
                 else
                     native.clearPedTasks(alt.Player.local.scriptID);
                 this._radioConfiguration.usingPrimaryRadio = isSending;
@@ -405,7 +442,7 @@ export class SaltyVoice {
             if (isSending != this._radioConfiguration.usingSecondaryRadio) {
                 alt.emitServer(ToServer.playerIsSending, this._radioConfiguration.secondaryChannel, isSending);
                 if (isSending && Config.enableRadioAnimation)
-                    native.taskPlayAnim(alt.Player.local.scriptID, "random@arrests", "generic_radio_enter", 2, 2, -1, 50, 1, false, false, false);
+                    native.taskPlayAnim(alt.Player.local.scriptID, 'random@arrests', 'generic_radio_enter', 2, 2, -1, 50, 1, false, false, false);
                 else
                     native.clearPedTasks(alt.Player.local.scriptID);
                 this._radioConfiguration.usingSecondaryRadio = isSending;
@@ -437,7 +474,8 @@ export class SaltyVoice {
         this._radioConfiguration.volume = volume;
     }
     onClientToggleRadioSpeaker() {
-        this._radioConfiguration.speakerEnabled = !this._radioConfiguration.speakerEnabled;
+        this._radioConfiguration.speakerEnabled =
+            !this._radioConfiguration.speakerEnabled;
         alt.emitServer(ToServer.toggleRadioSpeaker, this._radioConfiguration.speakerEnabled);
     }
     onClientPlaySound(fileName, loop = false, handle = null) {
@@ -447,5 +485,4 @@ export class SaltyVoice {
         this.stopSound(handle);
     }
 }
-SaltyVoice._instance = null;
 SaltyVoice.GetInstance();

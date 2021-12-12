@@ -10,6 +10,7 @@ export var FromServer;
     FromServer["phoneEnd"] = "SaltyChat:PhoneEnd";
     FromServer["radioSetChannel"] = "SaltyChat:RadioSetChannel";
     FromServer["radioLeaveChannel"] = "SaltyChat:RadioLeaveChannel";
+    FromServer["radioChannelMemberUpdated"] = "SaltyChat:RadioChannelMemberUpdated";
     FromServer["playerIsSending"] = "SaltyChat:PlayerIsSending";
     FromServer["playerIsSendingRelayed"] = "SaltyChat:PlayerIsSendingRelayed";
     FromServer["updateRadioTowers"] = "SaltyChat:UpdateRadioTowers";
