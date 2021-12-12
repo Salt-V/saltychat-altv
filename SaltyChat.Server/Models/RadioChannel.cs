@@ -39,7 +39,7 @@ namespace SaltyChat.Server.Models
 
                 voiceClient.Player.Emit("SaltyChat:RadioSetChannel", Name, isPrimary);
 
-                this.BroadcastEvent("SaltyChat:RadioChannelMemberUpdated", this.Name, this.Members.Select(m => m.VoiceClient.TeamSpeakName));
+                this.BroadcastEvent("SaltyChat:RadioChannelMemberUpdated", this.Name, this.Members.Select(m => m.VoiceClient.TeamSpeakName).ToArray());
 
                 foreach (var member in _members.Where(m => m.IsSending))
                 {
@@ -80,7 +80,7 @@ namespace SaltyChat.Server.Models
 
                 voiceClient.Player.Emit("SaltyChat:RadioLeaveChannel", null, member.IsPrimary);
 
-                this.BroadcastEvent("SaltyChat:RadioChannelMemberUpdated", this.Name, this.Members.Select(m => m.VoiceClient.TeamSpeakName));
+                this.BroadcastEvent("SaltyChat:RadioChannelMemberUpdated", this.Name, this.Members.Select(m => m.VoiceClient.TeamSpeakName).ToArray());
             }
         }
 
@@ -140,11 +140,11 @@ namespace SaltyChat.Server.Models
             }
         }
 
-        private void BroadcastEvent(string eventName, params object[] eventParams)
+        private void BroadcastEvent(string eventName, string channelName, object[] members)
         {
             foreach (RadioChannelMember member in this.Members)
             {
-                member.VoiceClient.Player.Emit(eventName, eventParams);
+                member.VoiceClient.Player.Emit(eventName, channelName ,members);
             }
         }
 
