@@ -20,10 +20,11 @@ Join the [Salty Chat Discord](https://discord.gg/MBCnqSf) and start with [Salty 
 # Current supported plugin version
 see [Versioning and Update Branches](https://github.com/saltminede/saltychat-docs#versioning-and-update-branches)
 - [ ] ~~SaltyChat 1.3.3 Stable~~
-- [X] SaltyChat 2.X.X Stable
+- [X] SaltyChat 2.3.6+ Stable
+- [X] SaltyChat 3.X.X Stable
 
 # Wiki
-For more information and a getting started guide check out the [wiki](https://deluvas1911.gitbook.io/saltychat-alt-v/).
+For more information and a getting started guide check out the [wiki](https://lorian-atashi.gitbook.io/saltychat-alt-v/).
 
 # Support
 **There won't be any private support for this script.**\
