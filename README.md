@@ -20,6 +20,7 @@ Join the [Salty Chat Discord](https://discord.gg/MBCnqSf) and start with [Salty 
 # Current supported plugin version
 see [Versioning and Update Branches](https://github.com/saltminede/saltychat-docs#versioning-and-update-branches)
 - [ ] ~~SaltyChat 1.3.3 Stable~~
+- [ ] ~~SaltyChat 2.0.0 Stable~~
 - [X] SaltyChat 2.3.6+ Stable
 - [X] SaltyChat 3.X.X Stable
 
