@@ -25,7 +25,7 @@ namespace SaltyChat.Server
         private readonly Dictionary<IPlayer, VoiceClient> _voiceClients = new();
         private readonly List<PhoneCall> _phoneCalls = new();
         private readonly List<RadioChannel> _radioChannels = new();
-        private const string _Version = "1.2.1"; // ToDo: Change on update
+        private const string _Version = "1.2.4"; // ToDo: Change on update
 
         #endregion
 
@@ -62,6 +62,7 @@ namespace SaltyChat.Server
             Alt.OnClient<IPlayer, string, bool>("SaltyChat:PlayerIsSending", OnClientPlayerIsSending);
             Alt.OnClient<IPlayer, float>("SaltyChat:SetRange", OnClientSetRange);
             Alt.OnClient<IPlayer, bool>("SaltyChat:ToggleRadioSpeaker", OnClientToggleRadioSpeaker);
+            Alt.OnClient<IPlayer, int[]>("SaltyChat:RemoveStateBagHandler", OnClientRemoveStateBagHandler);
         }
 
         #endregion
@@ -124,6 +125,11 @@ namespace SaltyChat.Server
             {
                 radioChannelMembership.RadioChannel.SetSpeaker(voiceClient, state);
             }
+        }
+
+        private void OnClientRemoveStateBagHandler(IPlayer player, int[] cookies)
+        {
+            foreach(int i in cookies) RemoveStateBagKey(i);
         }
 
         #endregion
@@ -301,6 +307,8 @@ namespace SaltyChat.Server
                 return result;
             return null;
         }
+
+        internal void RemoveStateBagKey(string key) => Alt.DeleteSyncedMetaData(key);
 
         private string GetTeamSpeakName(IPlayer player)
         {
