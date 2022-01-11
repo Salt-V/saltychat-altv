@@ -146,7 +146,27 @@ namespace SaltyChat.Server.Models
         {
             VoiceManager.Instance.SetStateBagKey($"{State.SaltyChat_RadioChannelMember}:{this.Name}", this.Members.Select(m => m.VoiceClient.TeamSpeakName).ToArray());
         }
-        
+
+        private void UpdateSenderStateBag()
+        {
+            List<object> sender = new();
+
+            foreach (RadioChannelMember sendingMember in this.Members.Where(m => m.IsSending))
+            {
+                sender.Add(
+                    new
+                    {
+                        ServerId = sendingMember.VoiceClient.Player.Id, // Equivalent to GetServerId() ?
+                        Name = sendingMember.VoiceClient.TeamSpeakName,
+                        Position = sendingMember.VoiceClient.Player.Position
+                    }
+                );
+            }
+
+            VoiceManager.Instance.SetStateBagKey($"{State.SaltyChat_RadioChannelSender}:{this.Name}", sender);
+
+        }
+
         private void BroadcastEvent(string eventName, string channelName, object[] members)
         {
             foreach (RadioChannelMember member in this.Members)
