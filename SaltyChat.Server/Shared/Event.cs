@@ -25,8 +25,8 @@ namespace SaltyChat.Server.Shared
         public const string SaltyChat_RadioTrafficStateChanged = "SaltyChat_RadioTrafficStateChanged";
         #endregion
         #region Phone
-        public const string SaltyChat_EstablishCall = "SaltyChat_EstablishCall";
-        public const string SaltyChat_EstablishCallRelayed = "SaltyChat_EstablishCallRelayed";
+        public const string SaltyChat_PhoneEstablish = "SaltyChat:PhoneEstablish"; // aka. EstablishCall
+        public const string SaltyChat_PhoneEstablishRelayed = "SaltyChat:PhoneEstablishRelayed";
         public const string SaltyChat_EndCall = "SaltyChat_EndCall";
         #endregion
 
