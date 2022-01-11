@@ -46,7 +46,7 @@ namespace SaltyChat.Server.Models
                 {
                     voiceClient.Player.Emit("SaltyChat:PlayerIsSending", member.VoiceClient.Player, Name, true, false, member.VoiceClient.Player.Position);
                 }
-                //this.UpdateMemberStateBag();
+
             }
         }
 
@@ -140,7 +140,6 @@ namespace SaltyChat.Server.Models
                     member.VoiceClient.Player.Emit("SaltyChat:PlayerIsSending", voiceClient.Player, Name, isSending, stateChanged, voiceClient.Player.Position);
                 }
             }
-            //this.UpdateSenderStateBag();
         }
 
         private void UpdateMemberStateBag()
@@ -163,7 +162,7 @@ namespace SaltyChat.Server.Models
                     }
                 );
             }
-            
+
             VoiceManager.Instance.SetStateBagKey($"{State.SaltyChat_RadioChannelSender}:{this.Name}", sender);
         }
 

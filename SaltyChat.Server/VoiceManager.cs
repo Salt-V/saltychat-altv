@@ -62,7 +62,6 @@ namespace SaltyChat.Server
             Alt.OnClient<IPlayer, string, bool>("SaltyChat:PlayerIsSending", OnClientPlayerIsSending);
             Alt.OnClient<IPlayer, float>("SaltyChat:SetRange", OnClientSetRange);
             Alt.OnClient<IPlayer, bool>("SaltyChat:ToggleRadioSpeaker", OnClientToggleRadioSpeaker);
-            Alt.OnClient<IPlayer, int[]>("SaltyChat:RemoveStateBagHandler", OnClientRemoveStateBagHandler);
         }
 
         #endregion
@@ -125,11 +124,6 @@ namespace SaltyChat.Server
             {
                 radioChannelMembership.RadioChannel.SetSpeaker(voiceClient, state);
             }
-        }
-
-        private void OnClientRemoveStateBagHandler(IPlayer player, int[] cookies)
-        {
-            foreach(int i in cookies) RemoveStateBagKey(i);
         }
 
         #endregion
@@ -299,16 +293,14 @@ namespace SaltyChat.Server
         #endregion
 
         #region Methods: Misc
-        internal void SetStateBagKey(string key, object value) => Alt.SetSyncedMetaData(key,value);
+        internal void SetStateBagKey(string key, object value) => Alt.SetMetaData(key,value);
 
         internal object GetStateBagKey(string key)
         {
-            if (Alt.GetSyncedMetaData(key, out object result))
+            if (Alt.GetMetaData(key, out object result))
                 return result;
             return null;
         }
-
-        internal void RemoveStateBagKey(string key) => Alt.DeleteSyncedMetaData(key);
 
         private string GetTeamSpeakName(IPlayer player)
         {
