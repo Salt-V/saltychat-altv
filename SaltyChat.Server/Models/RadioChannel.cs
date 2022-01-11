@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SaltyChat.Server.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -45,6 +46,7 @@ namespace SaltyChat.Server.Models
                 {
                     voiceClient.Player.Emit("SaltyChat:PlayerIsSending", member.VoiceClient.Player, Name, true, false, member.VoiceClient.Player.Position);
                 }
+
             }
         }
 
@@ -140,6 +142,11 @@ namespace SaltyChat.Server.Models
             }
         }
 
+        private void UpdateMemberStateBag()
+        {
+            VoiceManager.Instance.SetStateBagKey($"{State.SaltyChat_RadioChannelMember}:{this.Name}", this.Members.Select(m => m.VoiceClient.TeamSpeakName).ToArray());
+        }
+        
         private void BroadcastEvent(string eventName, string channelName, object[] members)
         {
             foreach (RadioChannelMember member in this.Members)
