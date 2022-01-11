@@ -4,4 +4,5 @@
     playerIsSending = "SaltyChat:PlayerIsSending",
     setRange = "SaltyChat:SetRange",
     toggleRadioSpeaker = "SaltyChat:ToggleRadioSpeaker",
+    removeStateBagHandler = "SaltyChat:RemoveStateBagHandler",
 }
