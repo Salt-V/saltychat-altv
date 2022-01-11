@@ -293,6 +293,14 @@ namespace SaltyChat.Server
         #endregion
 
         #region Methods: Misc
+        internal void SetStateBagKey(string key, object value) => Alt.SetSyncedMetaData(key,value);
+
+        internal object GetStateBagKey(string key)
+        {
+            if (Alt.GetSyncedMetaData(key, out object result))
+                return result;
+            return null;
+        }
 
         private string GetTeamSpeakName(IPlayer player)
         {
