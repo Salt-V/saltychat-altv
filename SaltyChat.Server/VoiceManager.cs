@@ -202,10 +202,17 @@ namespace SaltyChat.Server
 
         private void OnServerEndCall(IPlayer caller, IPlayer called)
         {
-            var phoneCall = _phoneCalls.FirstOrDefault(c => c.Caller == caller && c.Called == called);
+            var phoneCall = _phoneCalls.FirstOrDefault(c => c.IsApplicableCall(caller, called));
             if (phoneCall == null) return;
             EndCall(phoneCall);
         }
+
+        public bool IsApplicableCall(IPlayer particiant1, IPlayer particiant1)
+        {
+            return Caller == particiant1 && Called == particiant2 || 
+            Caller == particiant2 && Called == particiant1;
+        }
+
 
         private void EndCall(PhoneCall phoneCall)
         {
