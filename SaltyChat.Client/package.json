@@ -13,6 +13,7 @@
   "devDependencies": {
     "@altv/types-client": "^1.5.2",
     "@altv/types-natives": "^1.1.0",
+    "@altv/types-shared": "^1.1.7",
     "@types/node": "^8.0.14",
     "tsc": "^1.20150623.0",
     "typescript": "^3.2.2"
