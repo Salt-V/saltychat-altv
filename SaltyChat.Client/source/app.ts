@@ -743,6 +743,13 @@ export class SaltyVoice {
           'facials@gen_male@variations@normal'
         );
     }
+
+    if (
+      teamSpeakName == this._configuration.teamSpeakName &&
+      Config.enableTalkingChangedEvent
+    ) {
+      alt.emit(ToClient.voiceTalkingChanged, isTalking);
+    }
   }
 
   private initializePlugin(): void {
