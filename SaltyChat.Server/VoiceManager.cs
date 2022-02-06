@@ -207,10 +207,9 @@ namespace SaltyChat.Server
             EndCall(phoneCall);
         }
 
-        public bool IsApplicableCall(IPlayer particiant1, IPlayer particiant1)
+        public bool IsApplicableCall(IPlayer particiant1, IPlayer particiant2)
         {
-            return Caller == particiant1 && Called == particiant2 || 
-            Caller == particiant2 && Called == particiant1;
+            return Caller == particiant1 && Called == particiant2 || Caller == particiant2 && Called == particiant1;
         }
 
 
