@@ -10,7 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AltV.Net" Version="9.0.2" />
+    <PackageReference Include="AltV.Net" Version="10.0.2-release" />
+    <PackageReference Include="AltV.Net.Shared" Version="10.0.2-release" />
   </ItemGroup>
 
 </Project>
