@@ -211,7 +211,7 @@ export class SaltyVoice {
         if (this._radioConfiguration.primaryChannel === channelName) {
             this.executeCommand(new PluginCommand(Command.updateRadioChannelmembers, new RadioChannelMemberUpdate(memberArray, true), this._configuration.serverIdentifier));
         }
-        else if (this._radioConfiguration.primaryChannel === channelName) {
+        else if (this._radioConfiguration.secondaryChannel === channelName) {
             this.executeCommand(new PluginCommand(Command.updateRadioChannelmembers, new RadioChannelMemberUpdate(memberArray, false), this._configuration.serverIdentifier));
         }
     }
