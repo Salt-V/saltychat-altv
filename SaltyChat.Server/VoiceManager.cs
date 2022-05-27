@@ -33,7 +33,7 @@ namespace SaltyChat.Server
 
         public VoiceManager()
         {
-            var configFile = Path.Combine(Alt.Core.RootDirectory, "resources", Alt.Core.Resource.Name, "config.json");
+            var configFile = Path.Combine(Alt.Resource.Path, "config.json");
             if (!File.Exists(configFile)) throw new FileNotFoundException("Missing config.json");
 
             try
